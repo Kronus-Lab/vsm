@@ -1,0 +1,6 @@
+{
+    "allow_any_name": true,
+    "enforce_hostnames": false,
+    "max_ttl": "8h",
+    "key_bits": 4096
+}

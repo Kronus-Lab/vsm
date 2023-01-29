@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Kronus' Lab - VPN Server Manager{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
+    <div class="container">
+        <img
+            class="navbar-brand"
+            src="/static/logo.png"
+            height="64"
+            width="60"
+        />
+        <a class="navbar-brand">Kronus' Lab - VPN Server Manager</a>
+        <div class="collapse navbar-collapse " id="navbarSupportedContent">
+            <div class="ms-auto text-white">Logged in as: {{username}}</div>
+            <form action="/logout">
+                <button class="btn btn-outline-info ms-3" type="submit">Logout</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container text-white justify-content-center">
+    <h4>Download VPN Server Configuration</h4>
+
+    <ul class="nav nav-pills nav-fill">
+      {% for vpn_server in vpn_servers %}
+        <li class="nav-item p-2">
+          <a class="nav-link bg-success text-white" href="/api/{{vpn_server}}">{{vpn_server}}</a>
+        </li>
+      {% endfor %}
+    </ul>
+</div>
+{% endblock %}

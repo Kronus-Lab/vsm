@@ -1,0 +1,35 @@
+services:
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - '6379:6379'
+  vsm:
+    image: kr0nus/vsm:v0.1
+    restart: always
+    ports:
+      - '3000:3000'
+    expose:
+      - '3000'
+    depends_on:
+      redis:
+        condition: service_started
+    volumes:
+      - config:/home/vsm/config:ro
+    environment:
+      - HOSTNAME=localhost
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - VAULT_URL=https://vault:8200
+      - AUTH_ISSUER=https://myidp.example.com
+      - AUTH_CLIENT_ID=client
+      - AUTH_CLIENT_SECRET=secret
+      - AUTH_USERNAME_FIELD=preferred_username
+      - AUTH_GROUPS_FIELD=groups
+      - FLASK_APP=vsm.py
+      - FLASK_ENV=development
+      - FLASK_SECRET=itsasecret
+
+volumes:
+  config:
+    external: true
