@@ -1,32 +1,46 @@
 name: Python Linter
 
-on: [push]
+on: [pull_request]
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
 
-        steps:
-        - uses: actions/checkout@v3
+    - name: Install python version
+      uses: gabrielfalcao/pyenv-action@v11
+      with:
+        default: 3.10
+        command: pip install -U pip  # upgrade pip after installing python
 
-        - name: Install python version
-          uses: gabrielfalcao/pyenv-action@v11
-          with:
-              default: 3.10
-              command: pip install -U pip  # upgrade pip after installing python
+    - name: Install pipenv
+      run: |
+          python -m pip install --upgrade pipenv wheel
 
-        - name: Install pipenv
-          run: |
-              python -m pip install --upgrade pipenv wheel
+    - name: Install dependencies
+      run: |
+          pipenv install -d
 
-        - name: Install dependencies
-          run: |
-              pipenv install -d
+    - name: Analysing the code with pylint
+      run: |
+          pipenv run pylint $(git ls-files '*.py')
 
-        - name: Analysing the code with pylint
-          run: |
-              pipenv run pylint $(git ls-files '*.py')
+    - name: Analysing the code with autopep8
+      run: |
+          pipenv run autopep8 -aad --exit-code $(git ls-files '*.py')
 
-        - name: Analysing the code with autopep8
-          run: |
-              pipenv run autopep8 -aad --exit-code $(git ls-files '*.py')
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build
+      run: |
+        docker buildx build .
