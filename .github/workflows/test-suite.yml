@@ -12,7 +12,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Install python version
-      uses: gabrielfalcao/pyenv-action@v11
+      uses: gabrielfalcao/pyenv-action@v13
       with:
         default: 3.10
         command: pip install -U pip  # upgrade pip after installing python
@@ -42,7 +42,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Install python version
-      uses: gabrielfalcao/pyenv-action@v11
+      uses: gabrielfalcao/pyenv-action@v13
       with:
         default: 3.10
         command: pip install -U pip  # upgrade pip after installing python
@@ -72,5 +72,8 @@ jobs:
       uses: docker/setup-buildx-action@v2
 
     - name: Build
-      run: |
-        docker buildx build .
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: ./Dockerfile
+        push: false
