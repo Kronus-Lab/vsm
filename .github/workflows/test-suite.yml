@@ -55,7 +55,7 @@ jobs:
       run: |
           pipenv install -d
 
-    - name: Analysing the code with pylint
+    - name: Checking licenses
       run: |
           pipenv requirements > requirements.txt
           pipenv run liccheck -r requirements.txt
