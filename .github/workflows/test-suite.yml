@@ -1,13 +1,15 @@
-name: Python Linter
+name: Test suite
 
 on: [pull_request]
 
 jobs:
   lint:
+    name: Python linting
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
 
     - name: Install python version
       uses: gabrielfalcao/pyenv-action@v11
@@ -31,7 +33,35 @@ jobs:
       run: |
           pipenv run autopep8 -aad --exit-code $(git ls-files '*.py')
 
+  license:
+    name: Licence check
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Install python version
+      uses: gabrielfalcao/pyenv-action@v11
+      with:
+        default: 3.10
+        command: pip install -U pip  # upgrade pip after installing python
+
+    - name: Install pipenv
+      run: |
+          python -m pip install --upgrade pipenv wheel
+
+    - name: Install dependencies
+      run: |
+          pipenv install -d
+
+    - name: Analysing the code with pylint
+      run: |
+          pipenv requirements > requirements.txt
+          pipenv run liccheck -r requirements.txt
+
   build:
+    name: Building container
     runs-on: ubuntu-latest
 
     steps:
