@@ -19,7 +19,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-          pip install -r requirements
+          pip install -r requirements.txt
           pip install pylint autopep8
 
     - name: Analysing the code with pylint
@@ -46,12 +46,12 @@ jobs:
 
     - name: Install dependencies
       run: |
-          pip install -r requirements
+          pip install -r requirements.txt
           pip install liccheck
 
     - name: Checking licenses
       run: |
-          liccheck -r requirements
+          liccheck -r requirements.txt
 
   build:
     name: Building container
