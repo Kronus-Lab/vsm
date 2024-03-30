@@ -27,3 +27,8 @@ jobs:
         file: ./Dockerfile
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/vsm:latest
+
+    - name: Generate SBOM
+      uses: anchore/sbom-action@v0
+      with:
+        image: ${{ secrets.DOCKERHUB_USERNAME }}/vsm:latest

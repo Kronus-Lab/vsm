@@ -14,16 +14,13 @@ jobs:
     - name: Install python version
       uses: gabrielfalcao/pyenv-action@v13
       with:
-        default: 3.10
+        default: 3.12
         command: pip install -U pip  # upgrade pip after installing python
-
-    - name: Install pipenv
-      run: |
-          python -m pip install --upgrade pipenv wheel
 
     - name: Install dependencies
       run: |
-          pipenv install -d
+          pip install -r requirements
+          pip install pylint
 
     - name: Analysing the code with pylint
       run: |
@@ -44,21 +41,17 @@ jobs:
     - name: Install python version
       uses: gabrielfalcao/pyenv-action@v13
       with:
-        default: 3.10
+        default: 3.12
         command: pip install -U pip  # upgrade pip after installing python
-
-    - name: Install pipenv
-      run: |
-          python -m pip install --upgrade pipenv wheel
 
     - name: Install dependencies
       run: |
-          pipenv install -d
+          pip install -r requirements
+          pip install liccheck
 
     - name: Checking licenses
       run: |
-          pipenv requirements > requirements.txt
-          pipenv run liccheck -r requirements.txt
+          pipenv run liccheck -r requirements
 
   build:
     name: Building container
@@ -77,3 +70,10 @@ jobs:
         context: .
         file: ./Dockerfile
         push: false
+        tags: vsm:devel
+      
+    - name: SBOM
+      uses: anchore/sbom-action@v0
+      with:
+        image: vsm:devel
+
