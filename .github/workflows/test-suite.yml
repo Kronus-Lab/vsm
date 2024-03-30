@@ -69,7 +69,7 @@ jobs:
       with:
         context: .
         file: ./Dockerfile
-        push: false
+        load: true
         tags: vsm:devel
       
     - name: SBOM
