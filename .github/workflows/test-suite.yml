@@ -20,15 +20,15 @@ jobs:
     - name: Install dependencies
       run: |
           pip install -r requirements
-          pip install pylint
+          pip install pylint autopep8
 
     - name: Analysing the code with pylint
       run: |
-          pipenv run pylint $(git ls-files '*.py')
+          pylint $(git ls-files '*.py')
 
     - name: Analysing the code with autopep8
       run: |
-          pipenv run autopep8 -aad --exit-code $(git ls-files '*.py')
+          autopep8 -aad --exit-code $(git ls-files '*.py')
 
   license:
     name: Licence check
@@ -51,7 +51,7 @@ jobs:
 
     - name: Checking licenses
       run: |
-          pipenv run liccheck -r requirements
+          liccheck -r requirements
 
   build:
     name: Building container
