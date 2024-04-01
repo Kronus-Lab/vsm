@@ -5,7 +5,6 @@ grab VPN configurations for OpenVPN Community Server
 
 # Standard libs as a whole
 import json
-import os
 import time
 
 # Specific modules of standard libs
@@ -183,7 +182,10 @@ def get_server_config(server):
         return redirect(INDEX_PAGE, 302)
 
     # Load custom CA Cert if needed
-    vault_custom_ca = APP_CONFIG['CUSTOM_VAULT_CA'] if 'CUSTOM_VAULT_CA' in APP_CONFIG.keys() else None
+    vault_custom_ca = None
+    if 'CUSTOM_VAULT_CA' in APP_CONFIG.keys():
+        APP_CONFIG['CUSTOM_VAULT_CA'] 
+    
     if APP_CONFIG['ENV'] == 'development':
         print(f'CustomCA Value: {vault_custom_ca}')
 
