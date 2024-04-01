@@ -25,7 +25,10 @@ print("Using cacerts from " + certifi.where())
 
 # Flask Settings
 app = Flask(__name__)
-app.secret_key = os.getenv('FLASK_SECRET')
+app_config = None
+with open('config/app.json', 'r', encoding='utf-8') as f:
+    app_config = json.load(f)
+app.secret_key = app_config['FLASK_SECRET']
 
 # App Settings
 VPN_MAPPINGS = None
@@ -40,20 +43,20 @@ AUTH_ENDPOINT = '/auth'
 API_BASE_PATH = '/api'
 
 # Configure session parameters
-SESSION_COOKIE_DOMAIN = os.getenv('HOSTNAME')
+SESSION_COOKIE_DOMAIN = app_config['HOSTNAME']
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'strict'
 SESSION_COOKIE_SECURE = False
-if app.config['ENV'] != 'development':  # Set Secure Cookie if not in dev
+if app_config['ENV'] != 'development':  # Set Secure Cookie if not in dev
     SESSION_COOKIE_SECURE = True
 
 # Setup OIDC
-issuer = os.getenv('AUTH_ISSUER')
-clientId = os.getenv('AUTH_CLIENT_ID')
-clientSecret = os.getenv('AUTH_CLIENT_SECRET')
+issuer = app_config['AUTH_ISSUER']
+clientId = app_config['AUTH_CLIENT_ID']
+clientSecret = app_config['AUTH_CLIENT_SECRET']
 oidcDiscoveryUrl = f'{issuer}/.well-known/openid-configuration'
-username_field = os.getenv('AUTH_USERNAME_FIELD')
-groups_field = os.getenv('AUTH_GROUPS_FIELD')
+username_field = app_config['AUTH_USERNAME_FIELD']
+groups_field = app_config['AUTH_GROUPS_FIELD']
 
 oauth = OAuth(app=app)
 oauth.register(
@@ -69,8 +72,8 @@ oauth.register(
 
 # Setup the Redis session cache
 rcon = redis.Redis(
-    host=os.getenv('REDIS_HOST'),
-    port=os.getenv('REDIS_PORT'),
+    host=app_config['REDIS_HOST'],
+    port=app_config['REDIS_PORT'],
     db=0)
 
 
@@ -180,16 +183,16 @@ def get_server_config(server):
         return redirect(INDEX_PAGE, 302)
 
     # Load custom CA Cert if needed
-    vault_custom_ca = os.getenv('CUSTOM_VAULT_CA')
-    if app.config['ENV'] == 'development':
+    vault_custom_ca = app_config['CUSTOM_VAULT_CA'] if 'CUSTOM_VAULT_CA' in app_config.keys() else None
+    if app_config['ENV'] == 'development':
         print(f'CustomCA Value: {vault_custom_ca}')
 
     # Skip SSL verification if in development
-    verify_cert = app.config['ENV'] != 'development'
+    verify_cert = app_config['ENV'] != 'development'
 
     # Connect to vault
     vault = hvac.Client(
-        url=os.getenv('VAULT_URL'),
+        url=app_config['VAULT_URL'],
         cert=vault_custom_ca,
         verify=verify_cert
     )
