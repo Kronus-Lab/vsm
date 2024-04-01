@@ -184,8 +184,8 @@ def get_server_config(server):
     # Load custom CA Cert if needed
     vault_custom_ca = None
     if 'CUSTOM_VAULT_CA' in APP_CONFIG.keys():
-        APP_CONFIG['CUSTOM_VAULT_CA'] 
-    
+        vault_custom_ca = APP_CONFIG['CUSTOM_VAULT_CA']
+
     if APP_CONFIG['ENV'] == 'development':
         print(f'CustomCA Value: {vault_custom_ca}')
 
