@@ -18,7 +18,7 @@ pycparser==2.21
 pyhcl==0.4.5
 python-dotenv==1.0.0
 redis==5.0.1
-requests==2.31.0
+requests==2.32.0
 urllib3==2.0.7
 Werkzeug==3.0.0
 WTForms==3.0.1
