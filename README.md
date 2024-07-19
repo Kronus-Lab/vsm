@@ -12,9 +12,9 @@ This project aims to provide a system to allow self-serve, short lived VPN acces
 
 
 ## How to deploy?
-Download a copy of the `docker-compose.yml` file from this repository, tweak it to what you need.
+Download a copy of the `docker-compose.yml` file from this repository, tweak it to what you need. The docker-compose.yml is set to deploy a local development copy of the whole stack (Vault, Keycloak, Redis, VSM and HAProxy). HAProxy is pre-configured so you you can generate a self-signed cert for `*.local.kronus.network` in `config/customca/leaf` and it will work with that cert (`*.local.kronus.network` is already set to `127.0.0.1` in the global DNS)
 
 rule of thumbs
-- the folder `/home/vsm/config` contains the `vpn_group_mapping.json` file needed. In K8s this can be a configmap
+- the folder `/home/vsm/config/vsm` contains the `vpn_group_mapping.json` file needed. In K8s this can be a configmap
 - the folder `/home/vsm/static` contains a single file called `logo.png` which can be overridden
 - the folder `/home/vsm/templates` containes the templates used to render the site. `index.html` is the file loaded by the app. `template.ovpn` contains the VPN configuration template file that gets rendered with the given parameters. You shouldn't need to change it as the vpnmetadata is pulled from vault.
