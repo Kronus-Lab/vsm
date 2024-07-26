@@ -24,6 +24,8 @@ services:
     restart: always
     expose:
       - 6379
+    ports:
+      - 6379:6379
   
   vsm:
     image: kr0nus/vsm:devel
@@ -46,14 +48,15 @@ services:
     ports: 
       - '80:80'
       - '443:443'
+    networks:
+      default:
+        aliases:
+          - vsm.local.kronus.network
+          - hcv.local.kronus.network
+          - kc.local.kronus.network
     depends_on:
       vsm:
         condition: service_started
     volumes:
       - ./config/haproxy:/usr/local/etc/haproxy:ro
       - ./config/customca/leaf:/certs/
-  
-
-volumes:
-  config:
-    external: true

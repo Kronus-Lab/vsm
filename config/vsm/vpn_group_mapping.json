@@ -1,11 +1,11 @@
 [
     {
         "vpn_server": "myserver",
-        "idp_group": "idpgroupname",
+        "idp_group": "/example",
         "vault_metadata_mountpoint": "vpnmeta",
-        "vault_metadata_path": "",
-        "vault_pki_mountpoint": "",
-        "vault_jwt_role": "",
-        "vault_jwt_path": ""
+        "vault_metadata_path": "develmeta",
+        "vault_pki_mountpoint": "vpn/devel",
+        "vault_jwt_role": "test-role",
+        "vault_jwt_path": "jwt"
     }
 ]
