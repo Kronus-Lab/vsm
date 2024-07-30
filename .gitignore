@@ -168,3 +168,8 @@ cython_debug/
 .terraform.lock.hcl
 # We don't need the state files since we rebuild in memory every new containers
 *.tfstate
+
+
+# Cypress stuff
+**/cypress/screenshots
+**/cypress/downloads
