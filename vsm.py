@@ -38,8 +38,8 @@ with open('config/vpn_group_mapping.json', 'r', encoding='utf-8') as f:
     VPN_MAPPINGS = json.load(f)
     for loaded_mapping in VPN_MAPPINGS:
         app.logger.info("Loaded Mapping: {vpnserver} to {idpgroup}",
-            vpnserver=loaded_mapping["vpn_server"],
-            idpgroup=loaded_mapping["idp_group"])
+                        vpnserver=loaded_mapping["vpn_server"],
+                        idpgroup=loaded_mapping["idp_group"])
 
 # Pages as constants
 INDEX_PAGE = '/'
@@ -101,7 +101,8 @@ def index():
 
     groups = user['userinfo'][groups_field]
 
-    app.logger.info("{username} has logged in and is in the following groups: {groups}",
+    app.logger.info(
+        "{username} has logged in and is in the following groups: {groups}",
         username=username,
         groups=groups)
 
@@ -230,7 +231,7 @@ def get_server_config(server):
         mount_point=vault_parameters['pki_mountpoint']
     )['data']
 
-    app.logger.info("VPN Metadata: {vpnmeta}",vpnmeta=vpnmeta)
+    app.logger.info("VPN Metadata: {vpnmeta}", vpnmeta=vpnmeta)
 
     resp = Response(
         render_template(
