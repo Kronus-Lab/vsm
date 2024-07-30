@@ -1,4 +1,4 @@
-const path = require("path");
+const path = require("path")
 
 describe('End to End testing of VPN Server Manager', () => {
   it('End to End Success', () => {
@@ -10,7 +10,7 @@ describe('End to End testing of VPN Server Manager', () => {
   })
 
   it('Verify the downloaded file', () => {
-    const downloadsFolder = Cypress.config("downloadsFolder");
+    const downloadsFolder = Cypress.config("downloadsFolder")
     cy.readFile(path.join(downloadsFolder, "myserver.ovpn"))
       .should("exist")
       .should("include", "cipher AES-256-CBC")
@@ -24,7 +24,7 @@ describe('End to End testing of VPN Server Manager', () => {
       .should("include", "<key>\n-----BEGIN RSA PRIVATE KEY-----\n")
       .should("include", "-----END RSA PRIVATE KEY-----\n</key>")
       .should("include", "<tls-crypt>\n#\n# 2048 bit OpenVPN static key\n#\n-----BEGIN OpenVPN Static key V1-----\nsingleline\nstatickey\n-----END OpenVPN Static key V1-----\n\n</tls-crypt>")
-  });
+  })
 
   it('Bad username', () => {
     cy.visit('http://vsm.local.kronus.network')
@@ -35,7 +35,8 @@ describe('End to End testing of VPN Server Manager', () => {
   })
 
   it('Not logged in', () => {
-    cy.visit('http://vsm.local.kronus.network/api/myserver').should("include", "Sign in to your account")
+    cy.visit('http://vsm.local.kronus.network/api/myserver')
+    cy.get('[id="kc-page-title"]').contains("Sign in to your account")
     cy.screenshot("not_logged_in")
   })
 
