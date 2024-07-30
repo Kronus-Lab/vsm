@@ -36,10 +36,10 @@ app.debug = APP_CONFIG['ENV'] == 'development'
 VPN_MAPPINGS = None
 with open('config/vpn_group_mapping.json', 'r', encoding='utf-8') as f:
     VPN_MAPPINGS = json.load(f)
-    for mapping in VPN_MAPPINGS:
+    for loaded_mapping in VPN_MAPPINGS:
         app.logger.info("Loaded Mapping: {vpnserver} to {idpgroup}",
-            vpnserver=mapping["vpn_server"], 
-            idpgroup=mapping["idp_group"])
+            vpnserver=loaded_mapping["vpn_server"],
+            idpgroup=loaded_mapping["idp_group"])
 
 # Pages as constants
 INDEX_PAGE = '/'
@@ -102,7 +102,7 @@ def index():
     groups = user['userinfo'][groups_field]
 
     app.logger.info("{username} has logged in and is in the following groups: {groups}",
-        username=username, 
+        username=username,
         groups=groups)
 
     vpn_servers = []
