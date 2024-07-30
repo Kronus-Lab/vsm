@@ -30,14 +30,16 @@ with open('config/app.json', 'r', encoding='utf-8') as f:
 app.secret_key = APP_CONFIG['FLASK_SECRET']
 
 # Enable flask debug mode for development environment
-app.debug = True if APP_CONFIG['ENV'] == 'development' else False
+app.debug = APP_CONFIG['ENV'] == 'development'
 
 # App Settings
 VPN_MAPPINGS = None
 with open('config/vpn_group_mapping.json', 'r', encoding='utf-8') as f:
     VPN_MAPPINGS = json.load(f)
     for mapping in VPN_MAPPINGS:
-        app.logger.info("Loaded Mapping: {vpnserver} to {idpgroup}".format(vpnserver=mapping["vpn_server"], idpgroup=mapping["idp_group"]))
+        app.logger.info("Loaded Mapping: {vpnserver} to {idpgroup}",
+            vpnserver=mapping["vpn_server"], 
+            idpgroup=mapping["idp_group"])
 
 # Pages as constants
 INDEX_PAGE = '/'
@@ -99,7 +101,9 @@ def index():
 
     groups = user['userinfo'][groups_field]
 
-    app.logger.info("{username} has logged in and is in the following groups: {groups}".format(username=username, groups=groups))
+    app.logger.info("{username} has logged in and is in the following groups: {groups}",
+        username=username, 
+        groups=groups)
 
     vpn_servers = []
     for mapping in VPN_MAPPINGS:
@@ -226,7 +230,7 @@ def get_server_config(server):
         mount_point=vault_parameters['pki_mountpoint']
     )['data']
 
-    app.logger.info("VPN Metadata: {vpnmeta}".format(vpnmeta=vpnmeta))
+    app.logger.info("VPN Metadata: {vpnmeta}",vpnmeta=vpnmeta)
 
     resp = Response(
         render_template(
