@@ -29,10 +29,17 @@ with open('config/app.json', 'r', encoding='utf-8') as f:
     APP_CONFIG = json.load(f)
 app.secret_key = APP_CONFIG['FLASK_SECRET']
 
+# Enable flask debug mode for development environment
+app.debug = APP_CONFIG['ENV'] == 'development'
+
 # App Settings
 VPN_MAPPINGS = None
 with open('config/vpn_group_mapping.json', 'r', encoding='utf-8') as f:
     VPN_MAPPINGS = json.load(f)
+    for loaded_mapping in VPN_MAPPINGS:
+        app.logger.info("Loaded Mapping: {vpnserver} to {idpgroup}",
+                        vpnserver=loaded_mapping["vpn_server"],
+                        idpgroup=loaded_mapping["idp_group"])
 
 # Pages as constants
 INDEX_PAGE = '/'
@@ -93,6 +100,12 @@ def index():
     username = None if user is None else user['userinfo'][username_field]
 
     groups = user['userinfo'][groups_field]
+
+    app.logger.info(
+        "{username} has logged in and is in the following groups: {groups}",
+        username=username,
+        groups=groups)
+
     vpn_servers = []
     for mapping in VPN_MAPPINGS:
         if mapping['idp_group'] in groups:
@@ -107,7 +120,8 @@ def index():
 @app.route(LOGIN_PAGE)
 def login():
     """UI - Login redirection"""
-    redirect_uri = url_for('auth', _external=True, _scheme='https')
+    scheme = 'http' if APP_CONFIG['ENV'] == 'development' else 'https'
+    redirect_uri = url_for('auth', _external=True, _scheme=scheme)
     return oauth.keycloak.authorize_redirect(redirect_uri)
 
 
@@ -144,14 +158,13 @@ def get_server_config(server):
     if uuid is not None and rcon.get(uuid) is not None:
         user = json.loads(rcon.get(uuid))
     else:
-        redirect(INDEX_PAGE, 302)
+        return redirect(INDEX_PAGE, 302)
 
     if user['expires_in'] <= 0:
         print('Expired session')
-        redirect(LOGIN_PAGE, 302)
+        return redirect(LOGIN_PAGE, 302)
 
     groups = user['userinfo']['groups']
-
     # Validate if the user is allowed to request a cert for the server
     #   by verifying if the server is one of the groups the user has
     #   access to
@@ -206,10 +219,10 @@ def get_server_config(server):
     )
 
     # Grab VPN Metadata
-    vpnmeta = vault.secrets.kv.v1.read_secret(
+    vpnmeta = vault.secrets.kv.v2.read_secret(
         mount_point=vault_parameters['metadata_mountpoint'],
         path=vault_parameters['metadata_path']
-    )['data']
+    )['data']['data']
 
     # Generate Certificate + Key
     cert_response = vault.secrets.pki.generate_certificate(
@@ -217,6 +230,8 @@ def get_server_config(server):
         common_name=user['userinfo'][username_field],
         mount_point=vault_parameters['pki_mountpoint']
     )['data']
+
+    app.logger.info("VPN Metadata: {vpnmeta}", vpnmeta=vpnmeta)
 
     resp = Response(
         render_template(

@@ -1,0 +1,14 @@
+{
+    "HOSTNAME": "vsm.local.kronus.network",
+    "REDIS_HOST": "redis",
+    "REDIS_PORT": "6379",
+    "VAULT_URL": "http://hcv.local.kronus.network",
+    "AUTH_ISSUER": "http://kc.local.kronus.network/realms/devel",
+    "AUTH_CLIENT_ID": "vsm",
+    "AUTH_CLIENT_SECRET": "devel1234",
+    "AUTH_USERNAME_FIELD": "preferred_username",
+    "AUTH_GROUPS_FIELD": "groups",
+    "FLASK_APP": "vsm.py",
+    "ENV": "development",
+    "FLASK_SECRET": "itsasecret"    
+}

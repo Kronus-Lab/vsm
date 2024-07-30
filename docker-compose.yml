@@ -1,22 +1,62 @@
-services:
+services:  
+  vault:
+    image: hashicorp/vault:latest
+    restart: always
+    expose:
+      - 8200
+    cap_add:
+      - IPC_LOCK
+    environment:
+      - VAULT_DEV_ROOT_TOKEN_ID=admin
+  
+  keycloak:
+    image: bitnami/keycloak:latest
+    restart: always
+    expose:
+      - 8080
+    environment:
+      - KEYCLOAK_HOSTNAME=kc.local.kronus.network
+      - KEYCLOAK_PROXY_HEADERS=xforwarded
+      - KEYCLOAK_DATABASE_VENDOR=dev-file 
+
   redis:
     image: redis:latest
     restart: always
-    ports:
-      - '6379:6379'
-  vsm:
-    image: kr0nus/vsm:v2.0
-    restart: always
-    ports:
-      - '3000:3000'
     expose:
-      - '3000'
+      - 6379
+    ports:
+      - 6379:6379
+  
+  vsm:
+    image: kr0nus/vsm:devel
+    restart: always
+    expose:
+      - 3000
     depends_on:
       redis:
         condition: service_started
+      keycloak:
+        condition: service_started
+      vault:
+        condition: service_started
     volumes:
-      - config:/app/config:ro
-
-volumes:
-  config:
-    external: true
+      - ./config/vsm:/app/config:ro
+  
+  haproxy:
+    image: haproxy:latest
+    restart: always
+    ports: 
+      - '80:80'
+      - '443:443'
+    networks:
+      default:
+        aliases:
+          - vsm.local.kronus.network
+          - hcv.local.kronus.network
+          - kc.local.kronus.network
+    depends_on:
+      vsm:
+        condition: service_started
+    volumes:
+      - ./config/haproxy:/usr/local/etc/haproxy:ro
+      - ./config/customca/leaf:/certs/
