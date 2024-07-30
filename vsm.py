@@ -153,11 +153,11 @@ def get_server_config(server):
     if uuid is not None and rcon.get(uuid) is not None:
         user = json.loads(rcon.get(uuid))
     else:
-        redirect(INDEX_PAGE, 302)
+        return redirect(INDEX_PAGE, 302)
 
     if user['expires_in'] <= 0:
         print('Expired session')
-        redirect(LOGIN_PAGE, 302)
+        return redirect(LOGIN_PAGE, 302)
 
     groups = user['userinfo']['groups']
     # Validate if the user is allowed to request a cert for the server
