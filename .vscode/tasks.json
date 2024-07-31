@@ -16,6 +16,16 @@
             "linux": {
                 "command": "test/presetup/cleanup.sh"
             }
+        },
+        {
+            "label": "Execute Test Suite",
+            "type": "shell",
+            "linux": {
+                "command": "npx cypress run --spec \"cypress/e2e/vsm.cy.js\"",
+                "options": {
+                    "cwd": "./test/src"
+                }
+            }
         }
     ]
 }

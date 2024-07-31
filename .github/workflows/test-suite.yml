@@ -9,10 +9,10 @@ jobs:
     
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Install python version
-      uses: gabrielfalcao/pyenv-action@v13
+      uses: gabrielfalcao/pyenv-action@v17
       with:
         default: 3.12
         command: pip install -U pip  # upgrade pip after installing python
@@ -39,7 +39,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Install python version
-      uses: gabrielfalcao/pyenv-action@v13
+      uses: gabrielfalcao/pyenv-action@v17
       with:
         default: 3.12
         command: pip install -U pip  # upgrade pip after installing python
@@ -53,27 +53,62 @@ jobs:
       run: |
           liccheck -r requirements.txt
 
-  build:
+  test:
     name: Building container
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@v3
 
     - name: Build
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v6
       with:
         context: .
         file: ./Dockerfile
         load: true
-        tags: vsm:devel
+        tags: kr0nus/vsm:devel
       
     - name: SBOM
       uses: anchore/sbom-action@v0
       with:
-        image: vsm:devel
+        image: kr0nus/vsm:devel
 
+    - name: Setup test stack
+      uses: adambirds/docker-compose-action@v1
+      with:
+        compose-file: "./docker-compose.yml"
+
+    - name: Execute test suite - Chrome
+      uses: cypress-io/github-action@v6
+      with:
+        browser: chrome
+        project: ./test/src
+        spec: cypress/e2e/vsm.cy.js
+    
+    - name: Upload execution screenshots (Chrome)
+      uses: actions/upload-artifact@v4
+      with:
+        name: Screenshots-Chrome
+        path: test/src/cypress/screenshots
+
+    - name: Cleanup test suite execution
+      run: |
+        rm -rf test/src/cypress/screenshots
+        rm -rf test/src/cypress/downloads
+
+    - name: Execute test suite - Firefox
+      uses: cypress-io/github-action@v6
+      with:
+        browser: firefox
+        project: ./test/src
+        spec: cypress/e2e/vsm.cy.js
+    
+    - name: Upload execution screenshots (Firefox)
+      uses: actions/upload-artifact@v4
+      with:
+        name: Screenshots-Firefox
+        path: test/src/cypress/screenshots
