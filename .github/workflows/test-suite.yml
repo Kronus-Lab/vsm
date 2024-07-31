@@ -113,6 +113,15 @@ jobs:
         terraform init --upgrade
         terraform apply --auto-approve
 
+    - name: Wait for Application to be up
+      run: |
+        # Wait for Vault to be up
+        echo "Waiting for VSM to start"
+        while [ $(curl -sI http://vsm.local.kronus.network | head -n1 | cut -d ' ' -f 2) -ge 400 ]; do
+            echo -n '.'
+            sleep 1
+            done
+
     - name: Execute test suite - Chrome
       uses: cypress-io/github-action@v6
       with:
