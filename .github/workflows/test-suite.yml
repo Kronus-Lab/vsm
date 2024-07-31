@@ -9,10 +9,10 @@ jobs:
     
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Install python version
-      uses: gabrielfalcao/pyenv-action@v13
+      uses: gabrielfalcao/pyenv-action@v17
       with:
         default: 3.12
         command: pip install -U pip  # upgrade pip after installing python
@@ -39,7 +39,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Install python version
-      uses: gabrielfalcao/pyenv-action@v13
+      uses: gabrielfalcao/pyenv-action@v17
       with:
         default: 3.12
         command: pip install -U pip  # upgrade pip after installing python
@@ -53,27 +53,104 @@ jobs:
       run: |
           liccheck -r requirements.txt
 
-  build:
+  test:
     name: Building container
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@v3
 
     - name: Build
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v6
       with:
         context: .
         file: ./Dockerfile
         load: true
-        tags: vsm:devel
+        tags: kr0nus/vsm:devel
       
     - name: SBOM
       uses: anchore/sbom-action@v0
       with:
-        image: vsm:devel
+        image: kr0nus/vsm:devel
 
+    - name: Setup test stack
+      uses: adambirds/docker-compose-action@v1.3.0
+      with:
+        compose-file: "./docker-compose.yml"
+
+    - name: Wait for stack to be up
+      timeout-minutes: 5
+      run: |
+        # Wait for HAProxy to awake
+        echo "Giving HAProxy 5 seconds to start"
+        sleep 5
+
+        # Wait for Keycloak to be up
+        echo "Waiting for Keycloak to start"
+        while [ $(curl -sI http://kc.local.kronus.network | head -n1 | cut -d ' ' -f 2) -ge 400 ]; do
+            echo -n '.'
+            sleep 1
+            done
+
+        echo ''
+
+        # Wait for Vault to be up
+        echo "Waiting for Vault to start"
+        while [ $(curl -sI http://hcv.local.kronus.network | head -n1 | cut -d ' ' -f 2) -ge 400 ]; do
+            echo -n '.'
+            sleep 1
+            done
+
+    - name: Setup terraform in execution
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Configure test intrastructure
+      run: |
+        cd test/presetup
+        terraform init --upgrade
+        terraform apply --auto-approve
+
+    - name: Wait for Application to be up
+      timeout-minutes: 5
+      run: |
+        # Wait for Vault to be up
+        echo "Waiting for VSM to start"
+        while [ $(curl -sI http://vsm.local.kronus.network | head -n1 | cut -d ' ' -f 2) -ge 400 ]; do
+            echo -n '.'
+            sleep 1
+            done
+
+    - name: Execute test suite - Chrome
+      uses: cypress-io/github-action@v6
+      with:
+        browser: chrome
+        spec: cypress/e2e/vsm.cy.js
+    
+    - name: Upload execution screenshots (Chrome)
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: Screenshots-Chrome
+        path: ./cypress/screenshots
+
+    - name: Cleanup test suite execution
+      run: |
+        rm -rf ./cypress/screenshots
+        rm -rf ./cypress/downloads
+
+    - name: Execute test suite - Firefox
+      uses: cypress-io/github-action@v6
+      with:
+        browser: firefox
+        spec: cypress/e2e/vsm.cy.js
+    
+    - name: Upload execution screenshots (Firefox)
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: Screenshots-Firefox
+        path: ./cypress/screenshots

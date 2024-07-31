@@ -169,6 +169,8 @@ cython_debug/
 # We don't need the state files since we rebuild in memory every new containers
 *.tfstate
 
+# Skip node modules
+node_modules
 
 # Cypress stuff
 **/cypress/screenshots
