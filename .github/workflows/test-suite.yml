@@ -129,6 +129,7 @@ jobs:
         spec: cypress/e2e/vsm.cy.js
     
     - name: Upload execution screenshots (Chrome)
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: Screenshots-Chrome
@@ -146,6 +147,7 @@ jobs:
         spec: cypress/e2e/vsm.cy.js
     
     - name: Upload execution screenshots (Firefox)
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: Screenshots-Firefox
