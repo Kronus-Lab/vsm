@@ -86,29 +86,27 @@ jobs:
       uses: cypress-io/github-action@v6
       with:
         browser: chrome
-        project: ./test/src
         spec: cypress/e2e/vsm.cy.js
     
     - name: Upload execution screenshots (Chrome)
       uses: actions/upload-artifact@v4
       with:
         name: Screenshots-Chrome
-        path: test/src/cypress/screenshots
+        path: ./cypress/screenshots
 
     - name: Cleanup test suite execution
       run: |
-        rm -rf test/src/cypress/screenshots
-        rm -rf test/src/cypress/downloads
+        rm -rf ./cypress/screenshots
+        rm -rf ./cypress/downloads
 
     - name: Execute test suite - Firefox
       uses: cypress-io/github-action@v6
       with:
         browser: firefox
-        project: ./test/src
         spec: cypress/e2e/vsm.cy.js
     
     - name: Upload execution screenshots (Firefox)
       uses: actions/upload-artifact@v4
       with:
         name: Screenshots-Firefox
-        path: test/src/cypress/screenshots
+        path: ./cypress/screenshots
