@@ -82,6 +82,37 @@ jobs:
       with:
         compose-file: "./docker-compose.yml"
 
+    - name: Wait for stack to be up
+      run: |
+        # Wait for HAProxy to awake
+        echo "Giving HAProxy 5 seconds to start"
+        sleep 5
+
+        # Wait for Keycloak to be up
+        echo "Waiting for Keycloak to start"
+        while [ $(curl -sI http://kc.local.kronus.network | head -n1 | cut -d ' ' -f 2) -ge 400 ]; do
+            echo -n '.'
+            sleep 1
+            done
+
+        echo ''
+
+        # Wait for Vault to be up
+        echo "Waiting for Vault to start"
+        while [ $(curl -sI http://hcv.local.kronus.network | head -n1 | cut -d ' ' -f 2) -ge 400 ]; do
+            echo -n '.'
+            sleep 1
+            done
+
+    - name: Setup terraform in execution
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Configure test intrastructure
+      run: |
+        cd test/presetup
+        terraform init --upgrade
+        terraform apply --auto-approve
+
     - name: Execute test suite - Chrome
       uses: cypress-io/github-action@v6
       with:
