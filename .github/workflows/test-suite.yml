@@ -83,6 +83,7 @@ jobs:
         compose-file: "./docker-compose.yml"
 
     - name: Wait for stack to be up
+      timeout-minutes: 5
       run: |
         # Wait for HAProxy to awake
         echo "Giving HAProxy 5 seconds to start"
@@ -114,6 +115,7 @@ jobs:
         terraform apply --auto-approve
 
     - name: Wait for Application to be up
+      timeout-minutes: 5
       run: |
         # Wait for Vault to be up
         echo "Waiting for VSM to start"
