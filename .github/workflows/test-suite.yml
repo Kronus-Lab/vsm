@@ -78,7 +78,7 @@ jobs:
         image: kr0nus/vsm:devel
 
     - name: Setup test stack
-      uses: adambirds/docker-compose-action@v1.3.0
+      uses: mdugas/docker-compose-action@v2.0.0-md
       with:
         compose-file: "./docker-compose.yml"
 
