@@ -57,19 +57,19 @@ if APP_CONFIG['ENV'] != 'development':  # Set Secure Cookie if not in dev
     SESSION_COOKIE_SECURE = True
 
 # Setup OIDC
-issuer = APP_CONFIG['AUTH_ISSUER']
-clientId = APP_CONFIG['AUTH_CLIENT_ID']
-clientSecret = APP_CONFIG['AUTH_CLIENT_SECRET']
-oidcDiscoveryUrl = f'{issuer}/.well-known/openid-configuration'
-username_field = APP_CONFIG['AUTH_USERNAME_FIELD']
-groups_field = APP_CONFIG['AUTH_GROUPS_FIELD']
+ISSUER = APP_CONFIG['AUTH_ISSUER']
+CLIENTID = APP_CONFIG['AUTH_CLIENT_ID']
+CLIENTSECRET = APP_CONFIG['AUTH_CLIENT_SECRET']
+OIDCDISCOVERYURL = f'{ISSUER}/.well-known/openid-configuration'
+USERNAMEFIELD = APP_CONFIG['AUTH_USERNAME_FIELD']
+GROUPSFIELD = APP_CONFIG['AUTH_GROUPS_FIELD']
 
 oauth = OAuth(app=app)
 oauth.register(
     name='keycloak',
-    client_id=clientId,
-    client_secret=clientSecret,
-    server_metadata_url=oidcDiscoveryUrl,
+    client_id=CLIENTID,
+    client_secret=CLIENTSECRET,
+    server_metadata_url=OIDCDISCOVERYURL,
     client_kwargs={
         'scope': 'openid email profile',
         'code_challenge_method': 'S256'  # enable PKCE
@@ -97,9 +97,9 @@ def index():
     if user['expires_at'] <= time.time():
         return redirect(LOGIN_PAGE, 302)
 
-    username = None if user is None else user['userinfo'][username_field]
+    username = None if user is None else user['userinfo'][USERNAMEFIELD]
 
-    groups = user['userinfo'][groups_field]
+    groups = user['userinfo'][GROUPSFIELD]
 
     app.logger.info(
         "%s has logged in and is in the following groups: %s",
@@ -227,7 +227,7 @@ def get_server_config(server):
     # Generate Certificate + Key
     cert_response = vault.secrets.pki.generate_certificate(
         name='client',
-        common_name=user['userinfo'][username_field],
+        common_name=user['userinfo'][USERNAMEFIELD],
         mount_point=vault_parameters['pki_mountpoint']
     )['data']
 
