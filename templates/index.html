@@ -13,7 +13,7 @@
         <a class="navbar-brand">Kronus' Lab - VPN Server Manager</a>
         <div class="collapse navbar-collapse " id="navbarSupportedContent">
             <div class="ms-auto text-white">Logged in as: {{username}}</div>
-            <form action="/logout">
+            <form action="/auth/logout">
                 <button class="btn btn-outline-info ms-3" type="submit">Logout</button>
             </form>
         </div>
@@ -26,7 +26,7 @@
     <ul class="nav nav-pills nav-fill">
       {% for vpn_server in vpn_servers %}
         <li class="nav-item p-2">
-          <a class="nav-link bg-success text-white" href="/api/{{vpn_server}}">{{vpn_server}}</a>
+          <a class="nav-link bg-success text-white" href="/api/servers/{{vpn_server}}">{{vpn_server}}</a>
         </li>
       {% endfor %}
     </ul>
