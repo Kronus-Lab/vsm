@@ -3,13 +3,21 @@ const path = require("path")
 describe('End to End testing of VPN Server Manager', () => {
   it('End to End Success', () => {
     cy.visit('http://vsm.local.kronus.network')
-    cy.get('[id=":r1:"]').click()
-    cy.origin('http://kc.local.kronus.network', () => {
-      cy.get('[id="username"]').type("testuser")
-      cy.get('[id="kc-login"]').click()  
-    })
-    cy.get('a[href="/api/servers/myserver"]').click()
-    cy.screenshot("success")
+    cy.get('[id="username"]').type("testuser")
+    cy.get('[id="kc-login"]').click()
+    cy.origin('http://vsm.local.kronus.network', () => {
+      cy.window()
+      .document()
+       .then(function (doc) {
+          doc.addEventListener('click', () => {
+            setTimeout(function () {
+              doc.location.reload()
+            }, 2000)
+          })
+          cy.get('a[href="/api/servers/myserver"]').click()
+        })
+        cy.screenshot("success")
+      })
   })
 
   it('Verify the downloaded file', () => {
@@ -31,37 +39,46 @@ describe('End to End testing of VPN Server Manager', () => {
 
   it('Bad username', () => {
     cy.visit('http://vsm.local.kronus.network')
-    cy.get('[id=":r1:"]').click()
-    cy.origin('http://kc.local.kronus.network', () => {
-      cy.get('[id="username"]').type("baduser")
-      cy.get('[id="kc-login"]').click()
-      cy.get('span[id="input-error-username"]').should('be.visible')
-      cy.screenshot("bad_username")
-    })
+    cy.get('[id="username"]').type("baduser")
+    cy.get('[id="kc-login"]').click()
+    cy.get('span[id="input-error-username"]').should('be.visible')
+    cy.screenshot("bad_username")
   })
 
   it('Not logged in', () => {
     cy.visit('http://vsm.local.kronus.network/api/servers/myserver')
-    cy.get('[id=":r1:"]').contains("Login")
     cy.screenshot("not_logged_in")
   })
 
   it('Unknown Server', () => {
     cy.visit('http://vsm.local.kronus.network')
-    cy.get('[id=":r1:"]').click()
-    cy.origin('http://kc.local.kronus.network', () => {
-      cy.get('[id="username"]').type("testuser")
-      cy.get('[id="kc-login"]').click()
+    cy.get('[id="username"]').type("testuser")
+    cy.get('[id="kc-login"]').click()
+    cy.origin('http://vsm.local.kronus.network', () => {
+      cy.request({
+        url: '/api/servers/badserver',
+        followRedirect: false, // turn off following redirects
+      }).then((resp) => {
+        // redirect status code is 302
+        expect(resp.status).to.eq(302)
+        expect(resp.redirectedToUrl).to.eq('http://vsm.local.kronus.network/')
+      })
+      cy.get('a[class="navbar-brand"').contains("Kronus' Lab - VPN Server Manager")
+      cy.screenshot("bad_server")
     })
-    cy.request({
-      url: '/api/servers/badserver',
-      followRedirect: false, // turn off following redirects
-    }).then((resp) => {
-      // redirect status code is 302
-      expect(resp.status).to.eq(302)
-      expect(resp.redirectedToUrl).to.eq('http://vsm.local.kronus.network/')
+  })
+
+  it('Who Am I endpoint test', () => {
+    cy.visit('http://vsm.local.kronus.network')
+    cy.get('[id="username"]').type("testuser")
+    cy.get('[id="kc-login"]').click()
+    cy.origin('http://vsm.local.kronus.network', () => {
+      cy.request('/api/whoami').then((resp) => {
+        expect(resp.status).to.eq(200)
+        expect(resp.body).to.have.property('username', 'testuser')
+        expect(resp.body).to.have.property('vpn_servers').to.be.an('array')
+      })
+      cy.screenshot("whoami")
     })
-    cy.get('div[id="title"').contains("VPN Server Manager")
-    cy.screenshot("bad_server")
   })
 })

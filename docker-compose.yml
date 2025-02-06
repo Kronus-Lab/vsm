@@ -41,14 +41,7 @@ services:
         condition: service_started
     volumes:
       - ./config/vsm:/app/config:ro
-  
-  vsmui:
-    image: kr0nus/vsm-ui:devel
-    restart: always
-    depends_on:
-      vsm:
-        condition: service_started
-  
+ 
   haproxy:
     image: haproxy:latest
     restart: always
