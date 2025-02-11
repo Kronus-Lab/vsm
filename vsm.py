@@ -83,6 +83,7 @@ rcon = redis.Redis(
     port=APP_CONFIG['REDIS_PORT'],
     db=0)
 
+
 @app.route(f'{WHOAMI_ENDPOINT}')
 def whoami():
     """API - Fetch user info from session"""
@@ -114,7 +115,11 @@ def whoami():
         response_payload
     )
 
-    return Response(json.dumps(response_payload), status=200, content_type='application/json')
+    return Response(
+        json.dumps(response_payload), 
+        status=200, 
+        content_type='application/json')
+
 
 @app.route(f'{INDEX_PAGE}')
 def index():
