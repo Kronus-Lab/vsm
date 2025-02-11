@@ -96,7 +96,7 @@ def whoami():
 
     if user['expires_at'] <= time.time():
         return Response(status=401)
-    
+
     groups = user['userinfo'][GROUPSFIELD]
 
     vpn_servers = []
@@ -108,7 +108,7 @@ def whoami():
         'username': user['userinfo'][USERNAMEFIELD],
         'vpn_servers': vpn_servers
     }
-    
+
     app.logger.debug(
         "whoami?: %s",
         response_payload
