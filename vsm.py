@@ -84,6 +84,15 @@ rcon = redis.Redis(
     db=0)
 
 
+def vpn_servers_access(groups: list[str]) -> list[str]:
+    """Map the oAuth token groups claim to VPN Server accesses"""
+    vpn_servers: list[str] = []
+    for mapping in VPN_MAPPINGS:
+        if mapping['idp_group'] in groups:
+            vpn_servers.append(mapping['vpn_server'])
+    return vpn_servers
+
+
 @app.route(f'{WHOAMI_ENDPOINT}')
 def whoami():
     """API - Fetch user info from session"""
@@ -100,10 +109,7 @@ def whoami():
 
     groups = user['userinfo'][GROUPSFIELD]
 
-    vpn_servers = []
-    for mapping in VPN_MAPPINGS:
-        if mapping['idp_group'] in groups:
-            vpn_servers.append(mapping['vpn_server'])
+    vpn_servers = vpn_servers_access(groups)
 
     response_payload = {
         'username': user['userinfo'][USERNAMEFIELD],
@@ -116,8 +122,8 @@ def whoami():
     )
 
     return Response(
-        json.dumps(response_payload), 
-        status=200, 
+        json.dumps(response_payload),
+        status=200,
         content_type='application/json')
 
 
@@ -144,10 +150,7 @@ def index():
         username,
         groups)
 
-    vpn_servers = []
-    for mapping in VPN_MAPPINGS:
-        if mapping['idp_group'] in groups:
-            vpn_servers.append(mapping['vpn_server'])
+    vpn_servers = vpn_servers_access(groups)
 
     return render_template(
         'index.html',
