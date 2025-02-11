@@ -41,7 +41,7 @@ services:
         condition: service_started
     volumes:
       - ./config/vsm:/app/config:ro
-  
+ 
   haproxy:
     image: haproxy:latest
     restart: always

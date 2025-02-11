@@ -43,10 +43,11 @@ with open('config/vpn_group_mapping.json', 'r', encoding='utf-8') as f:
 
 # Pages as constants
 INDEX_PAGE = '/'
-LOGIN_PAGE = '/login'
-LOGOUT_PAGE = '/logout'
-AUTH_ENDPOINT = '/auth'
-API_BASE_PATH = '/api'
+LOGIN_PAGE = '/auth/login'
+LOGOUT_PAGE = '/auth/logout'
+AUTH_ENDPOINT = '/auth/callback'
+API_BASE_PATH = '/api/servers'
+WHOAMI_ENDPOINT = '/api/whoami'
 
 # Configure session parameters
 SESSION_COOKIE_DOMAIN = APP_CONFIG['HOSTNAME']
@@ -83,6 +84,49 @@ rcon = redis.Redis(
     db=0)
 
 
+def vpn_servers_access(groups: list[str]) -> list[str]:
+    """Map the oAuth token groups claim to VPN Server accesses"""
+    vpn_servers: list[str] = []
+    for mapping in VPN_MAPPINGS:
+        if mapping['idp_group'] in groups:
+            vpn_servers.append(mapping['vpn_server'])
+    return vpn_servers
+
+
+@app.route(f'{WHOAMI_ENDPOINT}')
+def whoami():
+    """API - Fetch user info from session"""
+
+    uuid = session.get('user')
+    user = None
+    if uuid is not None and rcon.get(uuid) is not None:
+        user = json.loads(rcon.get(uuid))
+    else:
+        return Response(status=401)
+
+    if user['expires_at'] <= time.time():
+        return Response(status=401)
+
+    groups = user['userinfo'][GROUPSFIELD]
+
+    vpn_servers = vpn_servers_access(groups)
+
+    response_payload = {
+        'username': user['userinfo'][USERNAMEFIELD],
+        'vpn_servers': vpn_servers
+    }
+
+    app.logger.debug(
+        "whoami?: %s",
+        response_payload
+    )
+
+    return Response(
+        json.dumps(response_payload),
+        status=200,
+        content_type='application/json')
+
+
 @app.route(f'{INDEX_PAGE}')
 def index():
     """UI - Index page for the portal"""
@@ -106,10 +150,7 @@ def index():
         username,
         groups)
 
-    vpn_servers = []
-    for mapping in VPN_MAPPINGS:
-        if mapping['idp_group'] in groups:
-            vpn_servers.append(mapping['vpn_server'])
+    vpn_servers = vpn_servers_access(groups)
 
     return render_template(
         'index.html',
@@ -145,7 +186,7 @@ def logout():
     """UI - Logout"""
     rcon.delete(session['user'])
     session.pop('user', None)
-    return render_template('logout.html')
+    return redirect(INDEX_PAGE, 302)
 
 
 @app.route(f'{API_BASE_PATH}/<server>')
