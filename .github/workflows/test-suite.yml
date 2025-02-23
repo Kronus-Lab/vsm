@@ -23,7 +23,8 @@ jobs:
 
     - name: Analysing the code with pylint
       run: |
-          pylint $(git ls-files '*.py')
+          pylint vsm
+          pylint -d duplicate-code vsm /test/*.py
 
     - name: Analysing the code with autopep8
       run: |

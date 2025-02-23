@@ -1,10 +1,14 @@
+"""TEST CASES - INDEX"""
+
 import unittest
 import xmlrunner
 
 import test_utils
 from vsm import app
 
+
 class VSMIndexTestCase(unittest.TestCase):
+    """Test cases for the Index page"""
     def setUp(self):
         self.ctx = app.app_context()
         self.ctx.push()
@@ -13,8 +17,8 @@ class VSMIndexTestCase(unittest.TestCase):
     def tearDown(self):
         self.ctx.pop()
 
-
     def test_index(self):
+        """Index page test - logged in"""
         test_utils.login(self.client)
 
         # Get the index page after being authenticated
@@ -30,6 +34,7 @@ class VSMIndexTestCase(unittest.TestCase):
         test_utils.logout(self.client)
 
     def test_index_expired(self):
+        """Index page test - Expired session"""
         test_utils.login(self.client)
 
         test_utils.expire_session(self.client)
@@ -44,4 +49,4 @@ if __name__ == '__main__':
     unittest.main(
         testRunner=xmlrunner.XMLTestRunner(output='test-reports'),
         failfast=False, buffer=False, catchbreak=False
-    ) 
+    )
