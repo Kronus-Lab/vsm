@@ -1,0 +1,5 @@
+[run]
+omit = 
+    templates/*.html
+    templates/*.ovpn
+    test/*
