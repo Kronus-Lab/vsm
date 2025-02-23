@@ -9,6 +9,7 @@ from vsm import app
 
 class VSMServerTestCase(unittest.TestCase):
     """Test cases for generating server configuration files"""
+
     def setUp(self):
         self.ctx = app.app_context()
         self.ctx.push()

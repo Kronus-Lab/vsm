@@ -9,6 +9,7 @@ from vsm import app
 
 class VSMIndexTestCase(unittest.TestCase):
     """Test cases for the whoami API"""
+
     def setUp(self):
         self.ctx = app.app_context()
         self.ctx.push()
@@ -35,7 +36,6 @@ class VSMIndexTestCase(unittest.TestCase):
         assert 'myserver4' not in response.get_data(as_text=True)
 
         test_utils.logout(self.client)
-
 
     def test_whoami_expired(self):
         """WhoAmI test cases - expired session"""

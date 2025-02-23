@@ -55,7 +55,7 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'strict'
 SESSION_COOKIE_SECURE = False
 if APP_CONFIG['ENV'] != 'development':  # Set Secure Cookie if not in dev
-    SESSION_COOKIE_SECURE = True # pragma: no cover
+    SESSION_COOKIE_SECURE = True  # pragma: no cover
 
 # Setup OIDC
 ISSUER = APP_CONFIG['AUTH_ISSUER']
@@ -238,7 +238,7 @@ def get_server_config(server):
     # Load custom CA Cert if needed
     vault_custom_ca = None
     if 'CUSTOM_VAULT_CA' in APP_CONFIG.keys():
-        vault_custom_ca = APP_CONFIG['CUSTOM_VAULT_CA'] # pragma: no cover
+        vault_custom_ca = APP_CONFIG['CUSTOM_VAULT_CA']  # pragma: no cover
 
     if APP_CONFIG['ENV'] == 'development':
         print(f'CustomCA Value: {vault_custom_ca}')
@@ -294,5 +294,5 @@ def get_server_config(server):
     return resp
 
 
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     app.run(host='0.0.0.0', port=3000)

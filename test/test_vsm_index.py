@@ -9,6 +9,7 @@ from vsm import app
 
 class VSMIndexTestCase(unittest.TestCase):
     """Test cases for the Index page"""
+
     def setUp(self):
         self.ctx = app.app_context()
         self.ctx.push()
@@ -25,7 +26,8 @@ class VSMIndexTestCase(unittest.TestCase):
         response = self.client.get('/')
         assert response.status_code == 200
         assert 'Logged in as: testuser' in response.get_data(as_text=True)
-        assert 'Download VPN Server Configuration' in response.get_data(as_text=True)
+        assert 'Download VPN Server Configuration' in response.get_data(
+            as_text=True)
         assert 'myserver' in response.get_data(as_text=True)
         assert 'myserver2' in response.get_data(as_text=True)
         assert 'myserver3' in response.get_data(as_text=True)
@@ -44,6 +46,7 @@ class VSMIndexTestCase(unittest.TestCase):
         assert response.headers['Location'] == '/auth/login'
 
         test_utils.logout(self.client)
+
 
 if __name__ == '__main__':
     unittest.main(

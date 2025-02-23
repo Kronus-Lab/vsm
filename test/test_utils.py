@@ -18,7 +18,6 @@ def login(client: FlaskClient):
     assert 'Location' in response.headers
     assert response.headers['Location'] == '/auth/login'
 
-
     # Get the login API to send you to Keycloak's auth form
     response = client.get('/auth/login')
     assert response.status_code == 302
@@ -33,17 +32,20 @@ def login(client: FlaskClient):
     idp_authenticate_endpoint = soup.find('form')['action']
 
     # Send the form data
-    response = requests_client.post(idp_authenticate_endpoint,
-                                    data={"username": "testuser"}, allow_redirects=False)
+    response = requests_client.post(
+        idp_authenticate_endpoint, data={
+            "username": "testuser"}, allow_redirects=False)
     assert response.status_code == 302
     assert 'Location' in response.headers
-    assert response.headers['Location'].startswith('http://localhost/auth/callback?')
+    assert response.headers['Location'].startswith(
+        'http://localhost/auth/callback?')
 
     # Finalize authentication with application
     response = client.get(response.headers['Location'])
     assert response.status_code == 302
     assert 'Location' in response.headers
     assert response.headers['Location'] == '/'
+
 
 def logout(client: FlaskClient):
     """Logout of the application"""
@@ -52,6 +54,7 @@ def logout(client: FlaskClient):
     assert response.status_code == 302
     assert 'Location' in response.headers
     assert response.headers['Location'] == '/'
+
 
 def expire_session(client: FlaskClient):
     """Expire a user session from the redis cache"""
