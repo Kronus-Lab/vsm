@@ -19,8 +19,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-          pip install -r requirements.txt
-          pip install pylint autopep8
+          pip install -r requirements.txt -r requirements-dev.txt
 
     - name: Analysing the code with pylint
       run: |

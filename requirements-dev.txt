@@ -1,0 +1,4 @@
+coverage==7.6.12
+autopep8==2.3.2
+pylint==3.3.3
+beautifulsoup4==4.13.3
