@@ -46,14 +46,13 @@ jobs:
 
     - name: Install dependencies
       run: |
-          pip install -r requirements.txt
-          pip install liccheck
+          pip install -r requirements.txt requirements-dev.txt
 
     - name: Checking licenses
       run: |
           liccheck -r requirements.txt
 
-  test:
+  e2e_tests:
     name: Building container
     runs-on: ubuntu-latest
 
@@ -155,6 +154,25 @@ jobs:
         name: Screenshots-Firefox
         path: ./cypress/screenshots
 
+
+  unit_tests:
+    name: Running unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install python version
+      uses: gabrielfalcao/pyenv-action@v17
+      with:
+        default: 3.12
+        command: pip install -U pip  # upgrade pip after installing python
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt -r requirements-dev.txt
+    
     - name: Execute unittests with code coverage
       if: always()
       run: |
