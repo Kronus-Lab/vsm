@@ -25,5 +25,14 @@
         "vault_pki_mountpoint": "vpn/devel",
         "vault_jwt_role": "test-role",
         "vault_jwt_path": "jwt"
+    },
+    {
+        "vpn_server": "myserver4",
+        "idp_group": "/example2",
+        "vault_metadata_mountpoint": "vpnmeta",
+        "vault_metadata_path": "develmeta",
+        "vault_pki_mountpoint": "vpn/devel",
+        "vault_jwt_role": "test-role",
+        "vault_jwt_path": "jwt"
     }
 ]

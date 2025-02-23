@@ -18,6 +18,8 @@ services:
       - KEYCLOAK_HOSTNAME=kc.local.kronus.network
       - KEYCLOAK_PROXY_HEADERS=xforwarded
       - KEYCLOAK_DATABASE_VENDOR=dev-file 
+      - KEYCLOAK_LOG_LEVEL=debug
+      - KEYCLOAK_ROOT_LOG_LEVEL=DEBUG
 
   redis:
     image: redis:latest
