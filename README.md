@@ -1,4 +1,10 @@
 # VPN Server Manager
+## Badges
+![img](https://shields.io/github/actions/workflow/status/kronus-lab/vsm/docker-daily.yml?label=Latest+Docker+Build)
+![img](coverage-badge.svg)
+![img](tests-badge.svg)
+
+
 ## What is this?
 This project aims to provide a system to allow self-serve, short lived VPN access for users I host servers for. The diagram below illustrates the flow of information.
 

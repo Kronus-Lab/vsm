@@ -1,4 +1,5 @@
 import unittest
+import xmlrunner
 
 import test_utils
 from vsm import app
@@ -57,4 +58,7 @@ class VSMServerTestCase(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(
+        testRunner=xmlrunner.XMLTestRunner(output='test-reports'),
+        failfast=False, buffer=False, catchbreak=False
+    ) 

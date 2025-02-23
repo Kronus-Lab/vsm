@@ -1,0 +1,43 @@
+name: Generate badges
+on:
+    push:
+        branches:
+            - main
+        paths-ignore: 
+            - coverage-badge.svg
+            - tests-badge.svg
+
+permissions:
+    contents: write
+
+jobs:
+    generate_badge:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Install python version
+          uses: gabrielfalcao/pyenv-action@v17
+          with:
+            default: 3.12
+            command: pip install -U pip  # upgrade pip after installing python
+
+        - name: Install dependencies
+          run: |
+            pip install -r requirements.txt -r requirements-dev.txt
+
+        - name: Generate badges
+          run: |
+            python -m coverage -m xmlrunner discover test --output-file tests.xml &&\
+            coverage xml &&\
+            genbadge coverage -i coverage.xml &&\
+            genbadge tests -i tests.xml
+
+        - name: Commit badges to repository
+          run: |
+           git config --global user.name 'KronusLabs'
+           git config --global user.email 'kronuslabs@gmail.com'
+           git add coverage-badge.svg tests-badge.svg
+           git commit -m 'Update badges'
+           git push

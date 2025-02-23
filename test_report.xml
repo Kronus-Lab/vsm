@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+	<testsuite name="test_vsm_index.VSMIndexTestCase-20250223015157" tests="2" file="test_vsm_index.py" time="0.161" timestamp="2025-02-23T01:51:57" failures="0" errors="0" skipped="0">
+		<testcase classname="test_vsm_index.VSMIndexTestCase" name="test_index" time="0.098" timestamp="2025-02-23T01:51:57" file="test/test_vsm_index.py" line="17">
+			<system-err><![CDATA[[2025-02-23 01:51:57,595] INFO in vsm: testuser has logged in and is in the following groups: ['/example']
+]]></system-err>
+		</testcase>
+		<testcase classname="test_vsm_index.VSMIndexTestCase" name="test_index_expired" time="0.063" timestamp="2025-02-23T01:51:57" file="test/test_vsm_index.py" line="32"/>
+	</testsuite>
+	<testsuite name="test_vsm_server.VSMServerTestCase-20250223015157" tests="5" file="test_vsm_server.py" time="1.908" timestamp="2025-02-23T01:51:59" failures="0" errors="0" skipped="0">
+		<testcase classname="test_vsm_server.VSMServerTestCase" name="test_get_server_config" time="1.733" timestamp="2025-02-23T01:51:59" file="test/test_vsm_server.py" line="17">
+			<system-out><![CDATA[CustomCA Value: None
+]]></system-out>
+			<system-err><![CDATA[[2025-02-23 01:51:59,398] INFO in vsm: VPN Metadata: {'certificate_authority': '-----BEGIN CERTIFICATE-----\nsingleline\ncertificate\n-----END CERTIFICATE-----', 'cipher': 'AES-256-CBC', 'digest': 'SHA1', 'hostname': 'myvpn.example.com', 'port': 1194, 'protocol': 'udp', 'server_dn': 'C=CA, ST=Ontario, L=Toronto, O=My Org, emailAddress=admin@example.com, CN=myvpn.example.com', 'server_tls_key': '#\n# 2048 bit OpenVPN static key\n#\n-----BEGIN OpenVPN Static key V1-----\nsingleline\nstatickey\n-----END OpenVPN Static key V1-----\n'}
+]]></system-err>
+		</testcase>
+		<testcase classname="test_vsm_server.VSMServerTestCase" name="test_get_server_config_denied_server" time="0.056" timestamp="2025-02-23T01:51:59" file="test/test_vsm_server.py" line="50"/>
+		<testcase classname="test_vsm_server.VSMServerTestCase" name="test_get_server_config_expired" time="0.056" timestamp="2025-02-23T01:51:59" file="test/test_vsm_server.py" line="26">
+			<system-out><![CDATA[Expired session
+]]></system-out>
+		</testcase>
+		<testcase classname="test_vsm_server.VSMServerTestCase" name="test_get_server_config_invalid_server" time="0.062" timestamp="2025-02-23T01:51:59" file="test/test_vsm_server.py" line="41"/>
+		<testcase classname="test_vsm_server.VSMServerTestCase" name="test_get_server_config_not_logged_in" time="0.001" timestamp="2025-02-23T01:51:59" file="test/test_vsm_server.py" line="36"/>
+	</testsuite>
+	<testsuite name="test_vsm_whoami.VSMIndexTestCase-20250223015157" tests="3" file="test_vsm_whoami.py" time="0.102" timestamp="2025-02-23T01:51:59" failures="0" errors="0" skipped="0">
+		<testcase classname="test_vsm_whoami.VSMIndexTestCase" name="test_whoami_expired" time="0.052" timestamp="2025-02-23T01:51:59" file="test/test_vsm_whoami.py" line="35"/>
+		<testcase classname="test_vsm_whoami.VSMIndexTestCase" name="test_whoami_loggedin" time="0.049" timestamp="2025-02-23T01:51:59" file="test/test_vsm_whoami.py" line="21">
+			<system-err><![CDATA[[2025-02-23 01:51:59,678] DEBUG in vsm: whoami?: {'username': 'testuser', 'vpn_servers': ['myserver', 'myserver2', 'myserver3']}
+]]></system-err>
+		</testcase>
+		<testcase classname="test_vsm_whoami.VSMIndexTestCase" name="test_whoami_not_loggedin" time="0.001" timestamp="2025-02-23T01:51:59" file="test/test_vsm_whoami.py" line="17"/>
+	</testsuite>
+</testsuites>

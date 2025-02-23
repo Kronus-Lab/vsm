@@ -1,8 +1,5 @@
 import unittest
-import base64
-import json
-
-from bs4 import BeautifulSoup
+import xmlrunner
 
 import test_utils
 from vsm import app
@@ -44,4 +41,7 @@ class VSMIndexTestCase(unittest.TestCase):
         test_utils.logout(self.client)
 
 if __name__ == '__main__':
-    unittest.main() 
+    unittest.main(
+        testRunner=xmlrunner.XMLTestRunner(output='test-reports'),
+        failfast=False, buffer=False, catchbreak=False
+    ) 
