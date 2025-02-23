@@ -24,7 +24,7 @@ jobs:
     - name: Analysing the code with pylint
       run: |
           pylint vsm
-          pylint -d duplicate-code vsm /test/*.py
+          pylint -d duplicate-code vsm test/*.py
 
     - name: Analysing the code with autopep8
       run: |
@@ -158,7 +158,7 @@ jobs:
     - name: Execute unittests with code coverage
       if: always()
       run: |
-        python -m coverage -m unittest discover test
+        python -m coverage run -m unittest discover test
         coverage report
         coverage html
     
