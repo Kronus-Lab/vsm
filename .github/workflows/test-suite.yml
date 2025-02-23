@@ -46,14 +46,14 @@ jobs:
 
     - name: Install dependencies
       run: |
-          pip install -r requirements.txt requirements-dev.txt
+          pip install -r requirements.txt -r requirements-dev.txt
 
     - name: Checking licenses
       run: |
           liccheck -r requirements.txt
 
-  e2e_tests:
-    name: Building container
+  tests:
+    name: End to End tests then unittests
     runs-on: ubuntu-latest
 
     steps:
@@ -153,16 +153,7 @@ jobs:
       with:
         name: Screenshots-Firefox
         path: ./cypress/screenshots
-
-
-  unit_tests:
-    name: Running unit tests
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-
+    
     - name: Install python version
       uses: gabrielfalcao/pyenv-action@v17
       with:
