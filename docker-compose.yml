@@ -42,7 +42,7 @@ services:
       vault:
         condition: service_started
     volumes:
-      - ./config/vsm:/app/config:ro
+      - ./config/vsm:/app/config/vsm:ro
  
   haproxy:
     image: haproxy:latest
