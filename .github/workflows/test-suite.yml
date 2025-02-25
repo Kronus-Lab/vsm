@@ -122,7 +122,7 @@ jobs:
       timeout-minutes: 5
       run: |
         echo "Waiting for VSM to start"
-        docker logs vsm-vsm-1
+        docker inspect vsm-vsm-1
         while [ $(curl -sI http://vsm.local.kronus.network | head -n1 | cut -d ' ' -f 2) -ge 400 ]; do
             echo -n '.'
             sleep 1
