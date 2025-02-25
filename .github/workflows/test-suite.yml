@@ -122,7 +122,6 @@ jobs:
       timeout-minutes: 5
       run: |
         echo "Waiting for VSM to start"
-        docker inspect vsm-vsm-1
         while [ $(curl -sI http://vsm.local.kronus.network | head -n1 | cut -d ' ' -f 2) -ge 400 ]; do
             echo -n '.'
             sleep 1
@@ -172,6 +171,7 @@ jobs:
     - name: Configure to use REDIS via localhost
       run: |
         sed -i "s/localhost/redis/g" config/vsm/app.json
+        cat config/vsm/app.json
     
     - name: Execute unittests with code coverage
       if: always()
