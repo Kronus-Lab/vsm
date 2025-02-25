@@ -79,6 +79,7 @@ jobs:
     - name: Configure to use REDIS from the stack
       run: |
         sed -i "s/localhost/redis/g" config/vsm/app.json
+        cat config/vsm/app.json
 
     - name: Setup test stack
       uses: adambirds/docker-compose-action@v1.4.0
@@ -120,8 +121,8 @@ jobs:
     - name: Wait for Application to be up
       timeout-minutes: 5
       run: |
-        # Wait for Vault to be up
         echo "Waiting for VSM to start"
+        docker ps -a
         while [ $(curl -sI http://vsm.local.kronus.network | head -n1 | cut -d ' ' -f 2) -ge 400 ]; do
             echo -n '.'
             sleep 1
