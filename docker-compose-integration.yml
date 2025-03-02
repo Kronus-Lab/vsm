@@ -13,4 +13,3 @@ services:
           - kc.local.kronus.network
     volumes:
       - ./config/haproxy-integration:/usr/local/etc/haproxy:ro
-      - ./config/customca/leaf:/certs/
