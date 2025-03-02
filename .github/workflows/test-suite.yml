@@ -52,9 +52,13 @@ jobs:
       run: |
           liccheck -r requirements.txt
 
-  tests:
+  e2etests:
     name: End to End tests then unittests
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        containers: [1, 2, 3, 4, 5]
 
     steps:
     - name: Checkout
@@ -81,7 +85,7 @@ jobs:
         sed -i "s/localhost/redis/g" config/vsm/app.json
         cat config/vsm/app.json
 
-    - name: Setup test stack
+    - name: Start test stack
       uses: adambirds/docker-compose-action@v1.4.0
       with:
         compose-file: "./docker-compose.yml"
@@ -132,6 +136,7 @@ jobs:
       with:
         browser: chrome
         spec: cypress/e2e/vsm.cy.js
+        parallel: true
     
     - name: Upload execution screenshots (Chrome)
       if: always()
@@ -150,6 +155,7 @@ jobs:
       with:
         browser: firefox
         spec: cypress/e2e/vsm.cy.js
+        parallel: true
     
     - name: Upload execution screenshots (Firefox)
       if: always()
@@ -157,7 +163,66 @@ jobs:
       with:
         name: Screenshots-Firefox
         path: ./cypress/screenshots
-    
+
+  integrationtests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Start test stack
+      uses: adambirds/docker-compose-action@v1.4.0
+      with:
+        compose-file: "./docker-compose.yml"
+        services: |
+          vault
+          keycloak
+          redis
+          haproxy
+
+    - name: Wait for stack to be up
+      timeout-minutes: 5
+      run: |
+        # Wait for HAProxy to awake
+        echo "Giving HAProxy 5 seconds to start"
+        sleep 5
+
+        # Wait for Keycloak to be up
+        echo "Waiting for Keycloak to start"
+        while [ $(curl -sI http://kc.local.kronus.network | head -n1 | cut -d ' ' -f 2) -ge 400 ]; do
+            echo -n '.'
+            sleep 1
+            done
+
+        echo ''
+
+        # Wait for Vault to be up
+        echo "Waiting for Vault to start"
+        while [ $(curl -sI http://hcv.local.kronus.network | head -n1 | cut -d ' ' -f 2) -ge 400 ]; do
+            echo -n '.'
+            sleep 1
+            done
+
+    - name: Setup terraform in execution
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Configure test intrastructure
+      run: |
+        cd test/presetup
+        terraform init --upgrade
+        terraform apply --auto-approve
+
+    - name: Wait for Application to be up
+      timeout-minutes: 5
+      run: |
+        echo "Waiting for VSM to start"
+        while [ $(curl -sI http://vsm.local.kronus.network | head -n1 | cut -d ' ' -f 2) -ge 400 ]; do
+            echo -n '.'
+            sleep 1
+            done
+
     - name: Install python version
       uses: gabrielfalcao/pyenv-action@v17
       with:

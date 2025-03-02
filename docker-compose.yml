@@ -56,9 +56,6 @@ services:
           - vsm.local.kronus.network
           - hcv.local.kronus.network
           - kc.local.kronus.network
-    depends_on:
-      vsm:
-        condition: service_started
     volumes:
       - ./config/haproxy:/usr/local/etc/haproxy:ro
       - ./config/customca/leaf:/certs/
