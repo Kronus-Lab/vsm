@@ -84,7 +84,9 @@ jobs:
     - name: Start test stack
       uses: adambirds/docker-compose-action@v1.4.0
       with:
-        compose-file: "./docker-compose.yml"
+        compose-file: |
+          ./docker-compose-common.yml
+          ./docker-compose-e2e.yml
 
     - name: Wait for stack to be up
       timeout-minutes: 5
@@ -151,12 +153,10 @@ jobs:
     - name: Start test stack
       uses: adambirds/docker-compose-action@v1.4.0
       with:
-        compose-file: "./docker-compose.yml"
-        services: |
-          vault
-          keycloak
-          redis
-          haproxy
+        compose-file: |
+          ./docker-compose-common.yml
+          ./docker-compose-integration.yml
+        
 
     - name: Wait for stack to be up
       timeout-minutes: 5

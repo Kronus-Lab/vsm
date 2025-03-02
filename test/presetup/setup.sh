@@ -7,7 +7,7 @@ if docker ps | grep -q vsm; then
 fi
 
 # Start docker compose
-docker compose up -d
+docker compose up -d -f docker-compose-common.yml -f docker-compose-e2e.yml
 
 
 # Wait for stack to be up
