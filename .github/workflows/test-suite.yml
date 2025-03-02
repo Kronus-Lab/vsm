@@ -173,13 +173,11 @@ jobs:
         sed -i "s/localhost/redis/g" config/vsm/app.json
         cat config/vsm/app.json
     
-    - name: Execute unittests with code coverage
+    - name: Execute tests with code coverage
       if: always()
       run: |
-        python -m coverage run -m unittest discover test
-        coverage report
-        coverage html
-    
+        pytest --cov --cov-report=term --cov-report=html
+
     - name: Upload coverage report
       if: always()
       uses: actions/upload-artifact@v4
