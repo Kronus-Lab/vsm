@@ -21,5 +21,5 @@ wait_for_service() {
 echo "Giving HAProxy 5 seconds to start"
 sleep 5
 
-+wait_for_service "http://kc.local.kronus.network" "Keycloak"
-+wait_for_service "http://hcv.local.kronus.network" "Vault"
+wait_for_service "http://kc.local.kronus.network" "Keycloak"
+wait_for_service "http://hcv.local.kronus.network" "Vault"
