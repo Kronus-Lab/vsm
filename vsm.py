@@ -262,7 +262,8 @@ def get_server_config(server):
     # Grab VPN Metadata
     vpnmeta = vault.secrets.kv.v2.read_secret(
         mount_point=vault_parameters['metadata_mountpoint'],
-        path=vault_parameters['metadata_path']
+        path=vault_parameters['metadata_path'],
+        raise_on_deleted_version=True
     )['data']['data']
 
     # Generate Certificate + Key
