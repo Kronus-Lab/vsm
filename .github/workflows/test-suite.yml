@@ -89,25 +89,7 @@ jobs:
     - name: Wait for stack to be up
       timeout-minutes: 5
       run: |
-        # Wait for HAProxy to awake
-        echo "Giving HAProxy 5 seconds to start"
-        sleep 5
-
-        # Wait for Keycloak to be up
-        echo "Waiting for Keycloak to start"
-        while [ $(curl -sI http://kc.local.kronus.network | head -n1 | cut -d ' ' -f 2) -ge 400 ]; do
-            echo -n '.'
-            sleep 1
-            done
-
-        echo ''
-
-        # Wait for Vault to be up
-        echo "Waiting for Vault to start"
-        while [ $(curl -sI http://hcv.local.kronus.network | head -n1 | cut -d ' ' -f 2) -ge 400 ]; do
-            echo -n '.'
-            sleep 1
-            done
+        ./test/presetup/wait.sh
 
     - name: Setup terraform in execution
       uses: hashicorp/setup-terraform@v3
@@ -179,26 +161,8 @@ jobs:
     - name: Wait for stack to be up
       timeout-minutes: 5
       run: |
-        # Wait for HAProxy to awake
-        echo "Giving HAProxy 5 seconds to start"
-        sleep 5
-
-        # Wait for Keycloak to be up
-        echo "Waiting for Keycloak to start"
-        while [ $(curl -sI http://kc.local.kronus.network | head -n1 | cut -d ' ' -f 2) -ge 400 ]; do
-            echo -n '.'
-            sleep 1
-            done
-
-        echo ''
-
-        # Wait for Vault to be up
-        echo "Waiting for Vault to start"
-        while [ $(curl -sI http://hcv.local.kronus.network | head -n1 | cut -d ' ' -f 2) -ge 400 ]; do
-            echo -n '.'
-            sleep 1
-            done
-
+        ./test/presetup/wait.sh
+    
     - name: Setup terraform in execution
       uses: hashicorp/setup-terraform@v3
 
@@ -207,15 +171,6 @@ jobs:
         cd test/presetup
         terraform init --upgrade
         terraform apply --auto-approve
-
-    - name: Wait for Application to be up
-      timeout-minutes: 5
-      run: |
-        echo "Waiting for VSM to start"
-        while [ $(curl -sI http://vsm.local.kronus.network | head -n1 | cut -d ' ' -f 2) -ge 400 ]; do
-            echo -n '.'
-            sleep 1
-            done
 
     - name: Install python version
       uses: gabrielfalcao/pyenv-action@v17
@@ -226,11 +181,6 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -r requirements.txt -r requirements-dev.txt
-    
-    - name: Configure to use REDIS via localhost
-      run: |
-        sed -i "s/redis/localhost/g" config/vsm/app.json
-        cat config/vsm/app.json
     
     - name: Execute tests with code coverage
       if: always()
