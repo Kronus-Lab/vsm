@@ -183,12 +183,10 @@ jobs:
         pip install -r requirements.txt -r requirements-dev.txt
     
     - name: Execute tests with code coverage
-      if: always()
       run: |
         pytest --cov --cov-report=term --cov-report=html
 
     - name: Upload coverage report
-      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: Coverage-Report
