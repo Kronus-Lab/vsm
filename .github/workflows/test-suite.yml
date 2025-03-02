@@ -170,7 +170,7 @@ jobs:
     
     - name: Configure to use REDIS via localhost
       run: |
-        sed -i "s/localhost/redis/g" config/vsm/app.json
+        sed -i "s/redis/localhost/g" config/vsm/app.json
         cat config/vsm/app.json
     
     - name: Execute tests with code coverage

@@ -1,11 +1,13 @@
 """ TEST - WhoAmI Endpoint """
 
-import fixtures
+import fixtures  # pylint: disable=unused-import
+
 
 def test_whoami_not_loggedin(client):
     """WhoAmI test cases - not logged in"""
     response = client.get('/api/whoami')
     assert response.status_code == 401
+
 
 def test_whoami_loggedin(client, login, logout):
     """WhoAmI test cases - logged in"""
@@ -20,6 +22,7 @@ def test_whoami_loggedin(client, login, logout):
     assert 'myserver4' not in response.get_data(as_text=True)
 
     logout(client)
+
 
 def test_whoami_expired(client, expire_session, login, logout):
     """WhoAmI test cases - expired session"""

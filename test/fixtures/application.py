@@ -7,6 +7,7 @@ from flask import Flask
 
 from vsm import app
 
+
 @pytest.fixture
 def application() -> Flask:
     """

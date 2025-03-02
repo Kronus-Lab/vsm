@@ -7,10 +7,11 @@ import requests
 from bs4 import BeautifulSoup
 from flask.testing import FlaskClient
 
+
 @pytest.fixture
 def login() -> Callable:
     """Helper function to login to the application"""
-   
+
     def factory(client: FlaskClient):
         # Grab the index page which redirects to the login API
         response = client.get('/')

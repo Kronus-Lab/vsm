@@ -1,6 +1,6 @@
 """ TEST - Index page """
 
-import fixtures
+import fixtures  # pylint: disable=unused-import
 
 
 def test_index(client, login, logout):

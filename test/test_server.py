@@ -1,6 +1,6 @@
 """ TEST - Server Endpoint """
 
-import fixtures
+import fixtures  # pylint: disable=unused-import
 
 
 def test_get_server_config(client, login, logout):
@@ -13,7 +13,8 @@ def test_get_server_config(client, login, logout):
 
     logout(client)
 
-def test_get_server_config_expired(client, expire_session,login, logout):
+
+def test_get_server_config_expired(client, expire_session, login, logout):
     """Server config test case - expired user is redirected to login"""
     login(client)
     expire_session(client)
@@ -24,11 +25,13 @@ def test_get_server_config_expired(client, expire_session,login, logout):
 
     logout(client)
 
+
 def test_get_server_config_not_logged_in(client):
     """Server config test case - not logged in redirects to /"""
     response = client.get('/api/servers/myserver')
     assert response.status_code == 302
     assert response.headers['Location'] == '/'
+
 
 def test_get_server_config_invalid_server(client, login, logout):
     """Server config test case - invalid server choice redirects to /"""
@@ -39,6 +42,7 @@ def test_get_server_config_invalid_server(client, login, logout):
     assert response.headers['Location'] == '/'
 
     logout(client)
+
 
 def test_get_server_config_denied_server(client, login, logout):
     """Server config test case - access denied is redirected to /"""
