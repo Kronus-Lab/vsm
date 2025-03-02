@@ -25,7 +25,7 @@ print("Using cacerts from " + certifi.where())
 # Flask Settings
 app = Flask(__name__)
 APP_CONFIG = None
-with open('config/app.json', 'r', encoding='utf-8') as f:
+with open('config/vsm/app.json', 'r', encoding='utf-8') as f:
     APP_CONFIG = json.load(f)
 app.secret_key = APP_CONFIG['FLASK_SECRET']
 
@@ -34,7 +34,7 @@ app.debug = APP_CONFIG['ENV'] == 'development'
 
 # App Settings
 VPN_MAPPINGS = None
-with open('config/vpn_group_mapping.json', 'r', encoding='utf-8') as f:
+with open('config/vsm/vpn_group_mapping.json', 'r', encoding='utf-8') as f:
     VPN_MAPPINGS = json.load(f)
     for loaded_mapping in VPN_MAPPINGS:
         app.logger.info("Loaded Mapping: %s to %s",
@@ -55,7 +55,7 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'strict'
 SESSION_COOKIE_SECURE = False
 if APP_CONFIG['ENV'] != 'development':  # Set Secure Cookie if not in dev
-    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True  # pragma: no cover
 
 # Setup OIDC
 ISSUER = APP_CONFIG['AUTH_ISSUER']
@@ -201,7 +201,7 @@ def get_server_config(server):
     else:
         return redirect(INDEX_PAGE, 302)
 
-    if user['expires_in'] <= 0:
+    if user['expires_at'] <= time.time():
         print('Expired session')
         return redirect(LOGIN_PAGE, 302)
 
@@ -238,7 +238,7 @@ def get_server_config(server):
     # Load custom CA Cert if needed
     vault_custom_ca = None
     if 'CUSTOM_VAULT_CA' in APP_CONFIG.keys():
-        vault_custom_ca = APP_CONFIG['CUSTOM_VAULT_CA']
+        vault_custom_ca = APP_CONFIG['CUSTOM_VAULT_CA']  # pragma: no cover
 
     if APP_CONFIG['ENV'] == 'development':
         print(f'CustomCA Value: {vault_custom_ca}')
@@ -262,7 +262,8 @@ def get_server_config(server):
     # Grab VPN Metadata
     vpnmeta = vault.secrets.kv.v2.read_secret(
         mount_point=vault_parameters['metadata_mountpoint'],
-        path=vault_parameters['metadata_path']
+        path=vault_parameters['metadata_path'],
+        raise_on_deleted_version=True
     )['data']['data']
 
     # Generate Certificate + Key
@@ -294,5 +295,5 @@ def get_server_config(server):
     return resp
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     app.run(host='0.0.0.0', port=3000)

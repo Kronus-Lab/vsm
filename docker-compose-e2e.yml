@@ -1,0 +1,30 @@
+services:
+  vsm:
+    image: kr0nus/vsm:devel
+    restart: always
+    expose:
+      - 3000
+    depends_on:
+      redis:
+        condition: service_started
+      keycloak:
+        condition: service_started
+      vault:
+        condition: service_started
+    volumes:
+      - ./config/vsm:/app/config/vsm:ro
+
+  haproxy:
+    image: haproxy:latest
+    restart: always
+    ports:
+      - '80:80'
+      - '443:443'
+    networks:
+      default:
+        aliases:
+          - vsm.local.kronus.network
+          - hcv.local.kronus.network
+          - kc.local.kronus.network
+    volumes:
+      - ./config/haproxy-e2e:/usr/local/etc/haproxy:ro

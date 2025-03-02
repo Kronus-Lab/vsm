@@ -1,0 +1,15 @@
+services:
+  haproxy:
+    image: haproxy:latest
+    restart: always
+    ports:
+      - '80:80'
+      - '443:443'
+    networks:
+      default:
+        aliases:
+          - vsm.local.kronus.network
+          - hcv.local.kronus.network
+          - kc.local.kronus.network
+    volumes:
+      - ./config/haproxy-integration:/usr/local/etc/haproxy:ro

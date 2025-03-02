@@ -31,7 +31,7 @@ variable "oidc_realm_name" {
 
 variable "oidc_redirect_urls" {
   type = list(string)
-  default = [ "http://vsm.local.kronus.network/*" ]
+  default = [ "http://vsm.local.kronus.network/*", "http://localhost/*" ]
 }
 
 # Keycloak section

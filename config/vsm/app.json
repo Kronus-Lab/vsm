@@ -1,6 +1,6 @@
 {
     "HOSTNAME": "vsm.local.kronus.network",
-    "REDIS_HOST": "redis",
+    "REDIS_HOST": "localhost",
     "REDIS_PORT": "6379",
     "VAULT_URL": "http://hcv.local.kronus.network",
     "AUTH_ISSUER": "http://kc.local.kronus.network/realms/devel",

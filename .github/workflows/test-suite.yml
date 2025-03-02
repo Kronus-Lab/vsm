@@ -19,12 +19,12 @@ jobs:
 
     - name: Install dependencies
       run: |
-          pip install -r requirements.txt
-          pip install pylint autopep8
+          pip install -r requirements.txt -r requirements-dev.txt
 
     - name: Analysing the code with pylint
       run: |
-          pylint $(git ls-files '*.py')
+          pylint vsm
+          pylint -d duplicate-code vsm test/*.py
 
     - name: Analysing the code with autopep8
       run: |
@@ -46,15 +46,14 @@ jobs:
 
     - name: Install dependencies
       run: |
-          pip install -r requirements.txt
-          pip install liccheck
+          pip install -r requirements.txt -r requirements-dev.txt
 
     - name: Checking licenses
       run: |
           liccheck -r requirements.txt
 
-  test:
-    name: Building container
+  e2etests:
+    name: End to End tests
     runs-on: ubuntu-latest
 
     steps:
@@ -77,33 +76,22 @@ jobs:
       with:
         image: kr0nus/vsm:devel
 
-    - name: Setup test stack
+    - name: Configure to use REDIS from the stack
+      run: |
+        sed -i "s/localhost/redis/g" config/vsm/app.json
+        cat config/vsm/app.json
+
+    - name: Start test stack
       uses: adambirds/docker-compose-action@v1.4.0
       with:
-        compose-file: "./docker-compose.yml"
+        compose-file: |
+          ./docker-compose-common.yml
+          ./docker-compose-e2e.yml
 
     - name: Wait for stack to be up
       timeout-minutes: 5
       run: |
-        # Wait for HAProxy to awake
-        echo "Giving HAProxy 5 seconds to start"
-        sleep 5
-
-        # Wait for Keycloak to be up
-        echo "Waiting for Keycloak to start"
-        while [ $(curl -sI http://kc.local.kronus.network | head -n1 | cut -d ' ' -f 2) -ge 400 ]; do
-            echo -n '.'
-            sleep 1
-            done
-
-        echo ''
-
-        # Wait for Vault to be up
-        echo "Waiting for Vault to start"
-        while [ $(curl -sI http://hcv.local.kronus.network | head -n1 | cut -d ' ' -f 2) -ge 400 ]; do
-            echo -n '.'
-            sleep 1
-            done
+        ./test/presetup/wait.sh
 
     - name: Setup terraform in execution
       uses: hashicorp/setup-terraform@v3
@@ -117,7 +105,6 @@ jobs:
     - name: Wait for Application to be up
       timeout-minutes: 5
       run: |
-        # Wait for Vault to be up
         echo "Waiting for VSM to start"
         while [ $(curl -sI http://vsm.local.kronus.network | head -n1 | cut -d ' ' -f 2) -ge 400 ]; do
             echo -n '.'
@@ -154,3 +141,53 @@ jobs:
       with:
         name: Screenshots-Firefox
         path: ./cypress/screenshots
+
+  integrationtests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Start test stack
+      uses: adambirds/docker-compose-action@v1.4.0
+      with:
+        compose-file: |
+          ./docker-compose-common.yml
+          ./docker-compose-integration.yml
+        
+
+    - name: Wait for stack to be up
+      timeout-minutes: 5
+      run: |
+        ./test/presetup/wait.sh
+    
+    - name: Setup terraform in execution
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Configure test intrastructure
+      run: |
+        cd test/presetup
+        terraform init --upgrade
+        terraform apply --auto-approve
+
+    - name: Install python version
+      uses: gabrielfalcao/pyenv-action@v17
+      with:
+        default: 3.12
+        command: pip install -U pip  # upgrade pip after installing python
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt -r requirements-dev.txt
+    
+    - name: Execute tests with code coverage
+      uses: pavelzw/pytest-action@v2
+      with:
+        verbose: true
+        emoji: true
+        job-summary: true
+        custom-arguments: "-q"
+        click-to-expand: true
+        report-title: "Integration Tests Report"

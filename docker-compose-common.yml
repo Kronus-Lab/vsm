@@ -1,0 +1,30 @@
+services:  
+  vault:
+    image: hashicorp/vault:latest
+    restart: always
+    expose:
+      - 8200
+    cap_add:
+      - IPC_LOCK
+    environment:
+      - VAULT_DEV_ROOT_TOKEN_ID=admin
+  
+  keycloak:
+    image: bitnami/keycloak:latest
+    restart: always
+    expose:
+      - 8080
+    environment:
+      - KEYCLOAK_HOSTNAME=kc.local.kronus.network
+      - KEYCLOAK_PROXY_HEADERS=xforwarded
+      - KEYCLOAK_DATABASE_VENDOR=dev-file 
+      - KEYCLOAK_LOG_LEVEL=debug
+      - KEYCLOAK_ROOT_LOG_LEVEL=DEBUG
+
+  redis:
+    image: redis:latest
+    restart: always
+    expose:
+      - 6379
+    ports:
+      - 6379:6379

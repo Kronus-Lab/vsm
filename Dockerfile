@@ -1,6 +1,7 @@
 FROM cgr.dev/chainguard/python:latest-dev AS builder
 WORKDIR /app
 COPY requirements.txt .
+COPY config/vsm/app.json .
 RUN pip install -r requirements.txt --user
 
 FROM cgr.dev/chainguard/python:latest
