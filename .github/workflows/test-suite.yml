@@ -183,8 +183,14 @@ jobs:
         pip install -r requirements.txt -r requirements-dev.txt
     
     - name: Execute tests with code coverage
-      run: |
-        pytest --cov --cov-report=term --cov-report=html
+      uses: pavelzw/pytest-action@v2
+      with:
+        verbose: true
+        emoji: true
+        job-summary: true
+        custom-arguments: "-q"
+        click-to-expand: true
+        report-title: "Integration Tests Report"
 
     - name: Upload coverage report
       uses: actions/upload-artifact@v4
