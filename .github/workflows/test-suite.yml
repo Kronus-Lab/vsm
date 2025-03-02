@@ -55,10 +55,6 @@ jobs:
   e2etests:
     name: End to End tests then unittests
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        containers: [1, 2, 3, 4, 5]
 
     steps:
     - name: Checkout
@@ -136,7 +132,6 @@ jobs:
       with:
         browser: chrome
         spec: cypress/e2e/vsm.cy.js
-        parallel: true
     
     - name: Upload execution screenshots (Chrome)
       if: always()
@@ -155,7 +150,6 @@ jobs:
       with:
         browser: firefox
         spec: cypress/e2e/vsm.cy.js
-        parallel: true
     
     - name: Upload execution screenshots (Firefox)
       if: always()
