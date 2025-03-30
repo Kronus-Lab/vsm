@@ -175,3 +175,7 @@ node_modules
 # Cypress stuff
 **/cypress/screenshots
 **/cypress/downloads
+
+# Devenv files
+.devenv
+.devenv.flake.nix
