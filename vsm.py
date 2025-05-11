@@ -41,6 +41,9 @@ with open('config/vsm/vpn_group_mapping.json', 'r', encoding='utf-8') as f:
                         loaded_mapping["vpn_server"],
                         loaded_mapping["idp_group"])
 
+# Preconfigured error responses
+GROUPS_NOT_IN_CLAIM = "\"Application not configured correctly. Missing groups in claim\""
+
 # Pages as constants
 INDEX_PAGE = '/'
 LOGIN_PAGE = '/auth/login'
@@ -93,19 +96,39 @@ def vpn_servers_access(groups: list[str]) -> list[str]:
     return vpn_servers
 
 
+def get_user_session() -> dict:
+    """Validate the session and test if the user needs to relogin"""
+
+    uuid = session.get('user')
+    user = None
+
+    # Load the user session from the cache if it exists
+    if uuid is not None and rcon.get(uuid) is not None:
+        user = json.loads(rcon.get(uuid))
+
+    # Void the user session if it is expired
+    if user is not None and user['expires_at'] <= time.time():
+        user = None
+
+    return user
+
+
 @app.route(f'{WHOAMI_ENDPOINT}')
 def whoami():
     """API - Fetch user info from session"""
 
-    uuid = session.get('user')
-    user = None
-    if uuid is not None and rcon.get(uuid) is not None:
-        user = json.loads(rcon.get(uuid))
-    else:
-        return Response(status=401)
+    # If user is not logged-in, return a 401
+    user = get_user_session()
+    if user is None:
+        return Response(status=401,
+                        response="{\"error-message\":\"Not Authenticated\"}")
 
-    if user['expires_at'] <= time.time():
-        return Response(status=401)
+    if GROUPSFIELD not in user['userinfo']:
+        return Response(
+            status=500,
+            response="{\"error-message\":" +
+            GROUPS_NOT_IN_CLAIM +
+            "}")  # pragma: no cover
 
     groups = user['userinfo'][GROUPSFIELD]
 
@@ -131,17 +154,19 @@ def whoami():
 def index():
     """UI - Index page for the portal"""
 
-    uuid = session.get('user')
-    user = None
-    if uuid is not None and rcon.get(uuid) is not None:
-        user = json.loads(rcon.get(uuid))
-    else:
+    # If user is not logged-in, redirect to login page
+    user = get_user_session()
+    if user is None:
         return redirect(LOGIN_PAGE, 302)
 
-    if user['expires_at'] <= time.time():
-        return redirect(LOGIN_PAGE, 302)
+    username = user['userinfo'][USERNAMEFIELD]
 
-    username = None if user is None else user['userinfo'][USERNAMEFIELD]
+    if GROUPSFIELD not in user['userinfo']:
+        return Response(
+            status=500,
+            response="{\"error-message\":" +
+            GROUPS_NOT_IN_CLAIM +
+            "}")  # pragma: no cover
 
     groups = user['userinfo'][GROUPSFIELD]
 
@@ -193,19 +218,19 @@ def logout():
 def get_server_config(server):
     """API - Request server access"""
 
-    # Grab user session/groups from Redis
-    uuid = session.get('user')
-    user = None
-    if uuid is not None and rcon.get(uuid) is not None:
-        user = json.loads(rcon.get(uuid))
-    else:
-        return redirect(INDEX_PAGE, 302)
+    # If user is not logged-in, return a 401
+    user = get_user_session()
+    if user is None:
+        return Response(status=401)
 
-    if user['expires_at'] <= time.time():
-        print('Expired session')
-        return redirect(LOGIN_PAGE, 302)
+    if GROUPSFIELD not in user['userinfo']:
+        return Response(
+            status=500,
+            response="{\"error-message\":" +
+            GROUPS_NOT_IN_CLAIM +
+            "}")  # pragma: no cover
 
-    groups = user['userinfo']['groups']
+    groups = user['userinfo'][GROUPSFIELD]
     # Validate if the user is allowed to request a cert for the server
     #   by verifying if the server is one of the groups the user has
     #   access to

@@ -15,22 +15,20 @@ def test_get_server_config(client, login, logout):
 
 
 def test_get_server_config_expired(client, expire_session, login, logout):
-    """Server config test case - expired user is redirected to login"""
+    """Server config test case - expired session return Unauthorized"""
     login(client)
     expire_session(client)
 
     response = client.get('/api/servers/myserver')
-    assert response.status_code == 302
-    assert response.headers['Location'] == '/auth/login'
+    assert response.status_code == 401
 
     logout(client)
 
 
 def test_get_server_config_not_logged_in(client):
-    """Server config test case - not logged in redirects to /"""
+    """Server config test case - not logged in return Unauthorized"""
     response = client.get('/api/servers/myserver')
-    assert response.status_code == 302
-    assert response.headers['Location'] == '/'
+    assert response.status_code == 401
 
 
 def test_get_server_config_invalid_server(client, login, logout):

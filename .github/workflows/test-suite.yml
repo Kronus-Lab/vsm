@@ -76,11 +76,6 @@ jobs:
       with:
         image: kr0nus/vsm:devel
 
-    - name: Configure to use REDIS from the stack
-      run: |
-        sed -i "s/localhost/redis/g" config/vsm/app.json
-        cat config/vsm/app.json
-
     - name: Start test stack
       uses: adambirds/docker-compose-action@v1.4.0
       with:

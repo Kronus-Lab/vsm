@@ -1,5 +1,7 @@
 #!/bin/sh
 
+MODE=$1
+
 # Check if development environment is already up
 if docker ps | grep -q vsm; then
     echo "Development environment up or broken. Please use cleanup task first"
@@ -7,7 +9,7 @@ if docker ps | grep -q vsm; then
 fi
 
 # Start docker compose
-docker compose -f docker-compose-common.yml -f docker-compose-e2e.yml up -d 
+docker compose -f docker-compose-common.yml -f docker-compose-$MODE.yml up -d 
 
 # Switch to presetup folder
 cd test/presetup
