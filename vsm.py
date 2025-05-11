@@ -124,9 +124,11 @@ def whoami():
                         response="{\"error-message\":\"Not Authenticated\"}")
 
     if GROUPSFIELD not in user['userinfo']:
-        return Response(status=500,
-                        response="{\"error-message\":" + GROUPS_NOT_IN_CLAIM + "}"
-                        )  # pragma: no cover
+        return Response(
+            status=500,
+            response="{\"error-message\":" +
+            GROUPS_NOT_IN_CLAIM +
+            "}")  # pragma: no cover
 
     groups = user['userinfo'][GROUPSFIELD]
 
@@ -160,9 +162,11 @@ def index():
     username = user['userinfo'][USERNAMEFIELD]
 
     if GROUPSFIELD not in user['userinfo']:
-        return Response(status=500,
-                        response="{\"error-message\":" + GROUPS_NOT_IN_CLAIM + "}"
-                        )  # pragma: no cover
+        return Response(
+            status=500,
+            response="{\"error-message\":" +
+            GROUPS_NOT_IN_CLAIM +
+            "}")  # pragma: no cover
 
     groups = user['userinfo'][GROUPSFIELD]
 
@@ -220,9 +224,11 @@ def get_server_config(server):
         return Response(status=401)
 
     if GROUPSFIELD not in user['userinfo']:
-        return Response(status=500,
-                        response="{\"error-message\":" + GROUPS_NOT_IN_CLAIM + "}"
-                        )  # pragma: no cover
+        return Response(
+            status=500,
+            response="{\"error-message\":" +
+            GROUPS_NOT_IN_CLAIM +
+            "}")  # pragma: no cover
 
     groups = user['userinfo'][GROUPSFIELD]
     # Validate if the user is allowed to request a cert for the server
