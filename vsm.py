@@ -93,18 +93,30 @@ def vpn_servers_access(groups: list[str]) -> list[str]:
     return vpn_servers
 
 
+def get_user_session() -> dict:
+    """Validate the session and test if the user needs to relogin"""
+
+    uuid = session.get('user')
+    user = None
+
+    # Load the user session from the cache if it exists
+    if uuid is not None and rcon.get(uuid) is not None:
+        user = json.loads(rcon.get(uuid))
+
+    # Void the user session if it is expired
+    if user is not None and user['expires_at'] <= time.time():
+        user = None
+
+    return user
+
+
 @app.route(f'{WHOAMI_ENDPOINT}')
 def whoami():
     """API - Fetch user info from session"""
 
-    uuid = session.get('user')
-    user = None
-    if uuid is not None and rcon.get(uuid) is not None:
-        user = json.loads(rcon.get(uuid))
-    else:
-        return Response(status=401)
-
-    if user['expires_at'] <= time.time():
+    # If user is not logged-in, return a 401
+    user = get_user_session()
+    if user is None:
         return Response(status=401)
 
     groups = user['userinfo'][GROUPSFIELD]
@@ -131,18 +143,12 @@ def whoami():
 def index():
     """UI - Index page for the portal"""
 
-    uuid = session.get('user')
-    user = None
-    if uuid is not None and rcon.get(uuid) is not None:
-        user = json.loads(rcon.get(uuid))
-    else:
+    # If user is not logged-in, redirect to login page
+    user = get_user_session()
+    if user is None:
         return redirect(LOGIN_PAGE, 302)
 
-    if user['expires_at'] <= time.time():
-        return redirect(LOGIN_PAGE, 302)
-
-    username = None if user is None else user['userinfo'][USERNAMEFIELD]
-
+    username = user['userinfo'][USERNAMEFIELD]
     groups = user['userinfo'][GROUPSFIELD]
 
     app.logger.info(
@@ -193,17 +199,10 @@ def logout():
 def get_server_config(server):
     """API - Request server access"""
 
-    # Grab user session/groups from Redis
-    uuid = session.get('user')
-    user = None
-    if uuid is not None and rcon.get(uuid) is not None:
-        user = json.loads(rcon.get(uuid))
-    else:
-        return redirect(INDEX_PAGE, 302)
-
-    if user['expires_at'] <= time.time():
-        print('Expired session')
-        return redirect(LOGIN_PAGE, 302)
+    # If user is not logged-in, return a 401
+    user = get_user_session()
+    if user is None:
+        return Response(status=401)
 
     groups = user['userinfo']['groups']
     # Validate if the user is allowed to request a cert for the server

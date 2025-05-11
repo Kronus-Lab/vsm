@@ -44,7 +44,13 @@ describe('End to End testing of VPN Server Manager', () => {
   })
 
   it('Not logged in', () => {
-    cy.visit('http://vsm.local.kronus.network/api/servers/myserver')
+    cy.request({
+      url: 'http://vsm.local.kronus.network/api/servers/myserver',
+      followRedirect: false,
+      failOnStatusCode: false
+    }).then((resp) => {
+      expect(resp.status).to.eq(401)
+    })
     cy.screenshot("not_logged_in")
   })
 
