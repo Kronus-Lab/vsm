@@ -10,8 +10,8 @@
     "teardown": "./test/presetup/cleanup.sh",
 
     "pretest": "npm run teardown && npm run setup -- integration",
-    "test": "pytest --cov --cov-report=term --cov-report=html",
-    "posttest": "npm run teardown",
+    "test": "pytest --cov --cov-report=term --cov-report=html --cov-report=xml --junit-xml=tests.xml",
+    "posttest": "npm run teardown && genbadge coverage -i coverage.xml && genbadge tests -i tests.xml",
     
     "pree2e": "npm run build && npm run teardown && npm run setup -- e2e",
     "e2e": "cypress run --e2e --browser firefox",
