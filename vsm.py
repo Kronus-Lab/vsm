@@ -88,7 +88,15 @@ rcon = redis.Redis(
 
 
 def vpn_servers_access(groups: list[str]) -> list[str]:
-    """Map the oAuth token groups claim to VPN Server accesses"""
+    """
+    Returns a list of VPN servers accessible to the user based on their group memberships.
+    
+    Args:
+        groups: List of group names from the user's OAuth token.
+    
+    Returns:
+        A list of VPN server identifiers the user is authorized to access.
+    """
     vpn_servers: list[str] = []
     for mapping in VPN_MAPPINGS:
         if mapping['idp_group'] in groups:
@@ -97,7 +105,12 @@ def vpn_servers_access(groups: list[str]) -> list[str]:
 
 
 def get_user_session() -> dict:
-    """Validate the session and test if the user needs to relogin"""
+    """
+    Retrieves and validates the current user's session from Redis cache.
+    
+    Returns:
+        The user session data as a dictionary if valid and not expired, otherwise None.
+    """
 
     uuid = session.get('user')
     user = None
@@ -115,7 +128,12 @@ def get_user_session() -> dict:
 
 @app.route(f'{WHOAMI_ENDPOINT}')
 def whoami():
-    """API - Fetch user info from session"""
+    """
+    Returns the authenticated user's username and accessible VPN servers as JSON.
+    
+    If the user session is missing or expired, returns a 401 Unauthorized response.
+    If the required groups claim is missing from the user info, returns a 500 error.
+    """
 
     # If user is not logged-in, return a 401
     user = get_user_session()
@@ -152,7 +170,11 @@ def whoami():
 
 @app.route(f'{INDEX_PAGE}')
 def index():
-    """UI - Index page for the portal"""
+    """
+    Renders the main portal page for authenticated users.
+    
+    If the user is not authenticated, redirects to the login page. Returns a 500 error if the required groups claim is missing from the user session. Displays the username and a list of accessible VPN servers.
+    """
 
     # If user is not logged-in, redirect to login page
     user = get_user_session()
@@ -216,7 +238,11 @@ def logout():
 
 @app.route(f'{API_BASE_PATH}/<server>')
 def get_server_config(server):
-    """API - Request server access"""
+    """
+    Provides an OpenVPN configuration file for a specified server if the authenticated user is authorized.
+    
+    If the user is not authenticated, returns HTTP 401. If the user's group claim is missing, returns HTTP 500. If the user is not authorized for the requested server, redirects to the index page. Otherwise, retrieves VPN metadata and generates a client certificate from Vault, then returns a rendered OpenVPN configuration file as a downloadable attachment.
+    """
 
     # If user is not logged-in, return a 401
     user = get_user_session()
