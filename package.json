@@ -1,18 +1,15 @@
 {
   "devDependencies": {
-    "cypress": "^14.0.0"
+    "cypress": "^15.3.0"
   },
-
   "scripts": {
     "build": "docker buildx build -t kr0nus/vsm:devel .",
     "lint": "pylint vsm && pylint -d duplicate-code vsm test/*.py && autopep8 -aad --exit-code $(git ls-files '*.py')",
     "setup": "./test/presetup/setup.sh",
     "teardown": "./test/presetup/cleanup.sh",
-
     "pretest": "npm run teardown && npm run setup -- integration",
     "test": "pytest --cov --cov-report=term --cov-report=html --cov-report=xml --junit-xml=tests.xml",
     "posttest": "npm run teardown && genbadge coverage -i coverage.xml && genbadge tests -i tests.xml",
-    
     "pree2e": "npm run build && npm run teardown && npm run setup -- e2e",
     "e2e": "cypress run --e2e --browser firefox",
     "poste2e": "npm run teardown"
