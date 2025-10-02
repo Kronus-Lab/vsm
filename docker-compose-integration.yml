@@ -2,6 +2,7 @@ services:
   haproxy:
     image: haproxy:latest
     restart: always
+    dns_search: ""
     ports:
       - '80:80'
       - '443:443'

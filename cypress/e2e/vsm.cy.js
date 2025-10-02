@@ -12,7 +12,7 @@ describe('End to End testing of VPN Server Manager', () => {
           doc.addEventListener('click', () => {
             setTimeout(function () {
               doc.location.reload()
-            }, 2000)
+            }, 10000)
           })
           cy.get('a[href="/api/servers/myserver"]').click()
         })
@@ -39,7 +39,7 @@ describe('End to End testing of VPN Server Manager', () => {
     cy.visit('http://vsm.local.kronus.network')
     cy.get('[id="username"]').type("baduser")
     cy.get('[id="kc-login"]').click()
-    cy.get('span[id="input-error-username"]').should('be.visible')
+    cy.get('div[id="input-error-username"]').should('be.visible')
     cy.screenshot("bad_username")
   })
 

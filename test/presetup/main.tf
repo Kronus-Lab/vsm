@@ -38,8 +38,8 @@ variable "oidc_redirect_urls" {
 
 provider "keycloak" {
   client_id     = "admin-cli"
-  username      = "user"
-  password      = "bitnami"
+  username      = "admin"
+  password      = "admin"
   url           = "http://kc.local.kronus.network"
 }
 
